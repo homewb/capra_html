@@ -52,6 +52,10 @@ public interface RouteModel {
 	public int getMoaSize();   // get total number of MOA solutions
 	// ==== End point =======
 	
+	public String getDistenceText(int pathIndex);
+	
+	public String getSystemInfomation();
+	
 	public void calcPath() throws FileNotFoundException, 
 	      XMLStreamException, LatLngException, CapraPathNotFoundException;
 	

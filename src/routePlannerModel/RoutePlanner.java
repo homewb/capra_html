@@ -1,6 +1,7 @@
 package routePlannerModel;
 
 import java.io.FileNotFoundException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,8 @@ public class RoutePlanner {
 	private GraphXMLLoader graphXmlLoader;
 	private Graph<Node, Edge> graph_WithContour;
 	private Graph<Node, Edge> graph_WithoutContour;
+	
+	private StringBuffer buffer = new StringBuffer();
 	
 	public String getOriginCoordinate(String origin) {		
 		origin_LatLng = geocoder.getLocation(origin);
@@ -273,6 +276,22 @@ public class RoutePlanner {
 	
 	// ============ End point ====================
 	
+	public String getDistenceText(int pathIndex) {
+		double  distanceValue;
+		
+		if (pathIndex == -1) {
+			return routes.get(0).getLegs().get(0).getDistance().toString();
+		}
+		else  {
+			distanceValue = pathSolutions.get(pathIndex).getDistance().getValue();
+		}
+		
+		String pattern = "###.##";
+		DecimalFormat decimalFormat = new DecimalFormat(pattern);
+		
+		return decimalFormat.format(distanceValue / 1000) + "km";
+	}
+	
 
 	// Core function: calculating all possible solutions
 	public void calcPath() throws FileNotFoundException, 
@@ -283,7 +302,9 @@ public class RoutePlanner {
 		}
 		
 		long time1 = System.currentTimeMillis();
-		System.out.println("start");
+		
+		buffer.append("*****Start******");
+		buffer.append(System.getProperty("line.separator"));
 		
         graphXmlLoader = new GraphXMLLoader();
 		
@@ -307,7 +328,9 @@ public class RoutePlanner {
 		
 		long time2 = System.currentTimeMillis();
 		long duration1 = time2 - time1;
-		System.out.println("reading finished, spent " + duration1 + "ms.");
+		
+		buffer.append("reading finished, spent " + duration1 + "ms.");
+		buffer.append(System.getProperty("line.separator"));
 		
 		// get Google directions
 		routes.clear();
@@ -322,7 +345,10 @@ public class RoutePlanner {
 		
 		long time3 = System.currentTimeMillis();
 		long duration2 = time3 - time2;
-		System.out.println("Google route finished, spent " + duration2 + "ms.");
+		
+		buffer.append("Google route finished, spent " + duration2 + "ms.");
+		buffer.append(System.getProperty("line.separator"));
+		
 				                
 		/*
 		 * ******************************
@@ -333,40 +359,60 @@ public class RoutePlanner {
 		// get routes by using different methods
 		pathSolutions.clear();
 		double directDistance = DistanceCalculator.getDistance(startLatLng, destination_LatLng);
-		System.out.println();
-		System.out.println("***CAPRA (Normal)***");
-		System.out.println("Direct distance: " + directDistance);
+		
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("***CAPRA (Normal)***");
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("Direct distance: " + directDistance);
+		buffer.append(System.getProperty("line.separator"));
+		
 		path_WithContour = getPath(startLatLng, destination_LatLng, CONTOUR);
 		
 		// Add first solution (by Capra with contour) to the list
 		pathSolutions.add(path_WithContour);
 		
 		// print data
-		System.out.println("----------------");
-		System.out.println("Elevation at node " + 
-				path_WithContour.getSteps().get(0).getStartNode().getId() + 
-				           ": " +
-				           path_WithContour.getSteps().get(0).getStartNode().getElevation());
+		int count_Node_Capra = 1;
+		int x = 1;
+		int y = 2;
+		buffer.append("----------------");
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("Elevation at node " + 
+		           count_Node_Capra + 
+		           ": " +
+		           path_WithContour.getSteps().get(0).getStartNode().getElevation());
+		buffer.append(System.getProperty("line.separator"));
+		
+		count_Node_Capra++;
+		
 		for (CapraPathStep ps : path_WithContour.getSteps()) {
-			System.out.println("Elevation at node " + 
-					ps.getEndNode().getId() + 
+			buffer.append("Elevation at node " + 
+					           count_Node_Capra + 
 			                   ": " +
 			                   ps.getEndNode().getElevation());
+			buffer.append(System.getProperty("line.separator"));
+			
+			count_Node_Capra++;
 		}
 		
 		for (CapraPathStep ps : path_WithContour.getSteps()) {
-			System.out.println("Length from node " + 
-		                       ps.getStartNode().getId() + 
-		                       " to node " +
-		                       ps.getEndNode().getId() + 
-		                       ": " + 
-		                       ps.getDistance());
+			buffer.append("Length from node " + 
+                    x + 
+                    " to node " +
+                    y + 
+                    ": " + 
+                    ps.getDistance());
+			buffer.append(System.getProperty("line.separator"));
+			
+			x++;
+			y++;
 		}
 		
 		long time4 = System.currentTimeMillis();
 		long duration3 = time4 - time3;
-		System.out.println("CAPRA path with contour finished, spent " + duration3 + "ms.");
 		
+		buffer.append("CAPRA path with contour finished, spent " + duration3 + "ms.");
+		buffer.append(System.getProperty("line.separator"));
 		/////////////////////////////////////////////////
 		
 //		System.out.println();
@@ -398,76 +444,114 @@ public class RoutePlanner {
 //		
 		long time5 = System.currentTimeMillis();
 		long duration4 = time5 - time3;
-		System.out.println("CAPRA path without contour finished, spent " + duration4 + "ms.");
 		
 		/////////////////////////////////////////////////
 		
-		System.out.println();
-		System.out.println("***A* (Distance)***");
-		System.out.println("Direct distance: " + directDistance);
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("***A* (Distance)***");
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("Direct distance: " + directDistance);
+		buffer.append(System.getProperty("line.separator"));
+		
 		path_Distance = getPath(startLatLng, destination_LatLng, DISTANCE);
 		
 		// Add second solution (by A* Distance) to the list
-		pathSolutions.add(path_Distance);
+		//pathSolutions.add(path_Distance);
 		
 		// print data
-		System.out.println("----------------");
-		System.out.println("Elevation at node " + 
-				path_Distance.getSteps().get(0).getStartNode().getId() + 
-				           ": " +
-				           path_Distance.getSteps().get(0).getStartNode().getElevation());
+		int count_Node_Astar = 1;
+		int m = 1;
+		int n = 2;
+		buffer.append("----------------");
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("Elevation at node " + 
+		           count_Node_Astar + 
+		           ": " +
+		           path_Distance.getSteps().get(0).getStartNode().getElevation());
+		buffer.append(System.getProperty("line.separator"));
+		
+		count_Node_Astar++;
+		
 		for (CapraPathStep ps : path_Distance.getSteps()) {
-			System.out.println("Elevation at node " + 
-					           ps.getEndNode().getId() + 
-			                   ": " +
-			                   ps.getEndNode().getElevation());
+			buffer.append("Elevation at node " + 
+			           count_Node_Astar + 
+	                   ": " +
+	                   ps.getEndNode().getElevation());
+			buffer.append(System.getProperty("line.separator"));
+			
+			count_Node_Astar++;
 		}
 		
 		for (CapraPathStep ps : path_Distance.getSteps()) {
-			System.out.println("Length from node " + 
-		                       ps.getStartNode().getId() + 
-		                       " to node " +
-		                       ps.getEndNode().getId() + 
-		                       ": " + 
-		                       ps.getDistance());
+			buffer.append("Length from node " + 
+                    m + 
+                    " to node " +
+                    n + 
+                    ": " + 
+                    ps.getDistance());
+			buffer.append(System.getProperty("line.separator"));
+			
+			m++;
+			n++;
 		}
 		
 		long time6 = System.currentTimeMillis();
 		long duration5 = time6 - time5;
-		System.out.println("A* finished, spent " + duration5 + "ms.");
+		buffer.append("A* finished, spent " + duration5 + "ms.");
+		buffer.append(System.getProperty("line.separator"));
 		
 		/////////////////////////////////////////////////
 		
-		System.out.println();
-		System.out.println("***MOA* (Distance)***");
-		System.out.println("Direct distance: " + directDistance);
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("***MOA* (Distance)***");
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("Direct distance: " + directDistance);
+		buffer.append(System.getProperty("line.separator"));
+		
 		paths_MOAStar = getPaths(startLatLng, destination_LatLng, MOASTAR);
 		
+		int count_Node_Moa = 1;
+		int p = 1;
+		int q = 2;
 		for (int i = 0; i < paths_MOAStar.size(); i++) {
 			
 			CapraPathLeg currPath = paths_MOAStar.get(i);
 			
 			// print data
-			System.out.println("----------------");
-			System.out.println("path " + i + ":");
-			System.out.println("Elevation at node " + 
-					currPath.getSteps().get(0).getStartNode().getId() + 
-					           ": " +
-					           currPath.getSteps().get(0).getStartNode().getElevation());
+			buffer.append("----------------");
+			buffer.append(System.getProperty("line.separator"));
+			buffer.append("path " + i + ":");
+			buffer.append(System.getProperty("line.separator"));
+			buffer.append("Elevation at node " + 
+					   count_Node_Moa + 
+			           ": " +
+			           currPath.getSteps().get(0).getStartNode().getElevation());
+			buffer.append(System.getProperty("line.separator"));
+			
+			count_Node_Moa++;
+			
 			for (CapraPathStep ps : currPath.getSteps()) {
-				System.out.println("Elevation at node " + 
-								   ps.getEndNode().getId() + 
-				                   ": " +
-				                   ps.getEndNode().getElevation());
+				buffer.append("Elevation at node " + 
+						   count_Node_Moa + 
+		                   ": " +
+		                   ps.getEndNode().getElevation());
+				buffer.append(System.getProperty("line.separator"));
+				
+				count_Node_Moa++;
+				
 			}
 			
 			for (CapraPathStep ps : currPath.getSteps()) {
-				System.out.println("Length from node " + 
-			                       ps.getStartNode().getId() + 
-			                       " to node " +
-			                       ps.getEndNode().getId() + 
-			                       ": " + 
-			                       ps.getDistance());
+				buffer.append("Length from node " + 
+	                       p + 
+	                       " to node " +
+	                       q + 
+	                       ": " + 
+	                       ps.getDistance());
+				buffer.append(System.getProperty("line.separator"));
+				
+				p++;
+				q++;
 			}
 		}
 		
@@ -476,21 +560,29 @@ public class RoutePlanner {
 		
 		long time7 = System.currentTimeMillis();
 		long duration6 = time7 - time6;
-		System.out.println("MOA* finished, spent " + duration6 + "ms.");
+		
+		buffer.append("MOA* finished, spent " + duration6 + "ms.");
+		buffer.append(System.getProperty("line.separator"));
 		
 		/////////////////////////////////////////////////
 		
-		System.out.println();
-		System.out.println("***Google***");
-		System.out.println("Direct distance: " + directDistance);
-		System.out.println("total distance: " + routes.get(0).getLegs().get(0).getDistance().toString());
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("***Google***");
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("Direct distance: " + directDistance);
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("total distance: " + routes.get(0).getLegs().get(0).getDistance().toString());
+		buffer.append(System.getProperty("line.separator"));
 		
 		// print data
 		int count_Node = 1;
 		int a = 1;
 		int b = 2;
-		System.out.println("Google");
-		System.out.println("-------------------");
+		
+		buffer.append("Google");
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("-------------------");
+		buffer.append(System.getProperty("line.separator"));
 		
 		ElevationApi eApi = new ElevationApi();
 		List<LatLng> list = new ArrayList<LatLng>();
@@ -503,25 +595,31 @@ public class RoutePlanner {
 		List<GElevationResult> eResult = eApi.getElevationByLocations(list);
 		
 		for (GElevationResult ds : eResult) {
-			System.out.println("Elevation at node " + 
-		                       count_Node + 
-		                       ": " + 
-		                       ds.getElevation());
+			buffer.append("Elevation at node " + 
+                    count_Node + 
+                    ": " + 
+                    ds.getElevation());
+			buffer.append(System.getProperty("line.separator"));
+			
 			count_Node++;
 		}
 		
 		for (GDirectionsStep ds : routes.get(0).getLegs().get(0).getSteps()) {
-			System.out.println("Length from node " + 
-		                       a + 
-		                       " to node " + 
-		                       b + 
-		                       ": " + 
-		                       ds.getDistance().getValue());
+			buffer.append("Length from node " + 
+                    a + 
+                    " to node " + 
+                    b + 
+                    ": " + 
+                    ds.getDistance().getValue());
+			buffer.append(System.getProperty("line.separator"));
+			
 			a++;
 			b++;
 		}
 		
-		System.out.println();
+		buffer.append(System.getProperty("line.separator"));
+		buffer.append("***** End ********");
+		buffer.append(System.getProperty("line.separator"));
 		
 		/*
 		 * ************************
@@ -532,6 +630,10 @@ public class RoutePlanner {
 		if (path_WithContour == null) {
 			throw new CapraPathNotFoundException("Cannot find path!");
 		}
+	}
+	
+	public String getSystemInfomation() {
+		return buffer.toString();
 	}
 	
 	public Edge getEdge(int index) {
@@ -740,7 +842,7 @@ public class RoutePlanner {
 	
 	// return MOA result
 	private List<CapraPathLeg> getMoaResults() {
-		return pathSolutions.subList(2, pathSolutions.size());
+		return pathSolutions.subList(1, pathSolutions.size());
 	}
 	
 	

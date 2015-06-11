@@ -344,6 +344,26 @@ public class Main {
                 return JSValue.create(size);
             }
         });
+        
+        browser.registerFunction("getDistance", new BrowserFunction() {
+        	public JSValue invoke(JSValue... args) {
+        		Double value = new Double(args[0].getNumber());
+            	int pathIndex = value.intValue();
+            	
+            	String distance = model.getDistenceText(pathIndex);
+            	
+            	return JSValue.create(distance);
+        	}
+        });
+        
+        browser.registerFunction("getSysteInfomation", new BrowserFunction() {
+        	public JSValue invoke(JSValue... args) {
+        		
+        		String systemInfo = model.getSystemInfomation();
+        		
+        		return JSValue.create(systemInfo);
+        	}
+        });
 		// ======== Function registration ends ==============
 	}
 

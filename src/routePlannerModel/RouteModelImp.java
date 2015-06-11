@@ -363,4 +363,16 @@ public class RouteModelImp implements RouteModel {
 		// TODO Auto-generated method stub
 		return routePlanner.getMoaSize();
 	}
+
+	@Override
+	public String getDistenceText(int pathIndex) {
+		
+		return routePlanner.getDistenceText(pathIndex);
+	}
+
+	@Override
+	public String getSystemInfomation() {
+		
+		return routePlanner.getSystemInfomation();
+	}
 }
