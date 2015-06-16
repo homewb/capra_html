@@ -116,4 +116,10 @@ public class Objectives implements Comparable<Objectives> {
 		System.out.println("horizontal distance = " + totalHorizontalDistance + 
 				", up distance = " + totalUpDistance + ", maxTangent = " + maxTangent);
 	}
+	
+	public void printMeToBuffer(StringBuffer callback) {
+		callback.append("horizontal distance = " + totalHorizontalDistance + 
+				", up distance = " + totalUpDistance + ", maxTangent = " + maxTangent);
+		callback.append(System.getProperty("line.separator"));
+	}
 }

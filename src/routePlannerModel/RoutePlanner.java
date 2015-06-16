@@ -366,46 +366,36 @@ public class RoutePlanner {
 		buffer.append("Direct distance: " + directDistance);
 		buffer.append(System.getProperty("line.separator"));
 		
-		path_WithContour = getPath(startLatLng, destination_LatLng, CONTOUR);
+		path_WithContour = getPath(startLatLng, destination_LatLng, CONTOUR, buffer);
 		
 		// Add first solution (by Capra with contour) to the list
 		pathSolutions.add(path_WithContour);
 		
 		// print data
-		int count_Node_Capra = 1;
-		int x = 1;
-		int y = 2;
 		buffer.append("----------------");
 		buffer.append(System.getProperty("line.separator"));
 		buffer.append("Elevation at node " + 
-		           count_Node_Capra + 
+				   path_WithContour.getSteps().get(0).getStartNode().getId() + 
 		           ": " +
 		           path_WithContour.getSteps().get(0).getStartNode().getElevation());
 		buffer.append(System.getProperty("line.separator"));
 		
-		count_Node_Capra++;
-		
 		for (CapraPathStep ps : path_WithContour.getSteps()) {
 			buffer.append("Elevation at node " + 
-					           count_Node_Capra + 
+					           ps.getEndNode().getId() + 
 			                   ": " +
 			                   ps.getEndNode().getElevation());
 			buffer.append(System.getProperty("line.separator"));
-			
-			count_Node_Capra++;
 		}
 		
 		for (CapraPathStep ps : path_WithContour.getSteps()) {
 			buffer.append("Length from node " + 
-                    x + 
+					ps.getStartNode().getId() + 
                     " to node " +
-                    y + 
+                    ps.getEndNode().getId() + 
                     ": " + 
                     ps.getDistance());
 			buffer.append(System.getProperty("line.separator"));
-			
-			x++;
-			y++;
 		}
 		
 		long time4 = System.currentTimeMillis();
@@ -453,46 +443,36 @@ public class RoutePlanner {
 		buffer.append("Direct distance: " + directDistance);
 		buffer.append(System.getProperty("line.separator"));
 		
-		path_Distance = getPath(startLatLng, destination_LatLng, DISTANCE);
+		path_Distance = getPath(startLatLng, destination_LatLng, DISTANCE, buffer);
 		
 		// Add second solution (by A* Distance) to the list
 		//pathSolutions.add(path_Distance);
 		
 		// print data
-		int count_Node_Astar = 1;
-		int m = 1;
-		int n = 2;
 		buffer.append("----------------");
 		buffer.append(System.getProperty("line.separator"));
 		buffer.append("Elevation at node " + 
-		           count_Node_Astar + 
+				   path_Distance.getSteps().get(0).getStartNode().getId() + 
 		           ": " +
 		           path_Distance.getSteps().get(0).getStartNode().getElevation());
 		buffer.append(System.getProperty("line.separator"));
 		
-		count_Node_Astar++;
-		
 		for (CapraPathStep ps : path_Distance.getSteps()) {
 			buffer.append("Elevation at node " + 
-			           count_Node_Astar + 
+					   ps.getEndNode().getId() + 
 	                   ": " +
 	                   ps.getEndNode().getElevation());
 			buffer.append(System.getProperty("line.separator"));
-			
-			count_Node_Astar++;
 		}
 		
 		for (CapraPathStep ps : path_Distance.getSteps()) {
 			buffer.append("Length from node " + 
-                    m + 
+					ps.getStartNode().getId() + 
                     " to node " +
-                    n + 
+                    ps.getEndNode().getId() + 
                     ": " + 
                     ps.getDistance());
 			buffer.append(System.getProperty("line.separator"));
-			
-			m++;
-			n++;
 		}
 		
 		long time6 = System.currentTimeMillis();
@@ -508,11 +488,8 @@ public class RoutePlanner {
 		buffer.append("Direct distance: " + directDistance);
 		buffer.append(System.getProperty("line.separator"));
 		
-		paths_MOAStar = getPaths(startLatLng, destination_LatLng, MOASTAR);
+		paths_MOAStar = getPaths(startLatLng, destination_LatLng, MOASTAR, buffer);
 		
-		int count_Node_Moa = 1;
-		int p = 1;
-		int q = 2;
 		for (int i = 0; i < paths_MOAStar.size(); i++) {
 			
 			CapraPathLeg currPath = paths_MOAStar.get(i);
@@ -523,35 +500,28 @@ public class RoutePlanner {
 			buffer.append("path " + i + ":");
 			buffer.append(System.getProperty("line.separator"));
 			buffer.append("Elevation at node " + 
-					   count_Node_Moa + 
+					   currPath.getSteps().get(0).getStartNode().getId() + 
 			           ": " +
 			           currPath.getSteps().get(0).getStartNode().getElevation());
 			buffer.append(System.getProperty("line.separator"));
 			
-			count_Node_Moa++;
-			
 			for (CapraPathStep ps : currPath.getSteps()) {
 				buffer.append("Elevation at node " + 
-						   count_Node_Moa + 
+						   ps.getEndNode().getId() + 
 		                   ": " +
 		                   ps.getEndNode().getElevation());
 				buffer.append(System.getProperty("line.separator"));
-				
-				count_Node_Moa++;
 				
 			}
 			
 			for (CapraPathStep ps : currPath.getSteps()) {
 				buffer.append("Length from node " + 
-	                       p + 
+	                       ps.getStartNode().getId() + 
 	                       " to node " +
-	                       q + 
+	                       ps.getEndNode().getId() + 
 	                       ": " + 
 	                       ps.getDistance());
 				buffer.append(System.getProperty("line.separator"));
-				
-				p++;
-				q++;
 			}
 		}
 		
@@ -654,13 +624,13 @@ public class RoutePlanner {
 	}
 
 	private CapraPathLeg getPath(LatLng origin_LatLng, 
-			LatLng destination_LatLng, int algorithmIndex) {
+			LatLng destination_LatLng, int algorithmIndex, StringBuffer buffer) {
 		Node source = getNearestNodeFromOrigin(origin_LatLng, algorithmIndex);
 		Node target = getNearestNodeFromDestination(destination_LatLng, algorithmIndex);
 		
 		switch (algorithmIndex) {
-		case CONTOUR : return astar.search(graph_WithContour, source, target);
-		case NO_CONTOUR : return astar.search(graph_WithoutContour, source, target);
+		case CONTOUR : return astar.search(graph_WithContour, source, target, buffer);
+		case NO_CONTOUR : return astar.search(graph_WithoutContour, source, target, buffer);
 		case DISTANCE : return astarDistance.search(graph_WithContour, source, target);
 		default : return null;
 		}
@@ -668,12 +638,12 @@ public class RoutePlanner {
 	
 	// Get MOAStar solutions
 	private List<CapraPathLeg> getPaths(LatLng origin_LatLng, 
-			LatLng destination_LatLng, int algorithmIndex) {
+			LatLng destination_LatLng, int algorithmIndex, StringBuffer buffer) {
 		Node source = getNearestNodeFromOrigin(origin_LatLng, algorithmIndex);
 		Node target = getNearestNodeFromDestination(destination_LatLng, algorithmIndex);
 		
 		switch (algorithmIndex) {
-		case MOASTAR : return moastar.search(graph_WithContour, source, target);
+		case MOASTAR : return moastar.search(graph_WithContour, source, target, buffer);
 		default : return null;
 		}
 	}

@@ -12,7 +12,7 @@ import dataModel.*;
 
 public class AStar {
 	
-	public CapraPathLeg search(Graph<Node, Edge> graph, Node source, Node target) {
+	public CapraPathLeg search(Graph<Node, Edge> graph, Node source, Node target, StringBuffer callback) {
 		Map<String, AStarNode> openSet = new HashMap<String, AStarNode>();
 		Map<String, AStarNode> closeSet = new HashMap<String, AStarNode>();
 		PriorityQueue<AStarNode> priorityQueue = 
@@ -110,6 +110,12 @@ public class AStar {
 			// print out total impossible segments
 			System.out.println("total distance of impossible segments: " + distance_impossible);
 			System.out.println("total distance: " + totalDistanceInLongValue);
+			
+			callback.append(System.getProperty("line.separator"));
+			callback.append("total distance of impossible segments: " + distance_impossible);
+			callback.append(System.getProperty("line.separator"));
+			callback.append("total distance: " + totalDistanceInLongValue);
+			callback.append(System.getProperty("line.separator"));
 			
 			return new CapraPathLeg(steps, totalDistance, 
 					source.getLocation(), target.getLocation());

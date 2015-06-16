@@ -71,4 +71,15 @@ public class MOAStarNode {
 		System.out.print("f: ");
 		fVector.printMe();
 	}
+	
+	public void printMeToBuffer(StringBuffer callback) {
+		callback.append("Node " + node.getId() + ": from " + cameFrom.getNode().getId());
+		callback.append(System.getProperty("line.separator"));
+		callback.append("g: ");
+		gVector.printMeToBuffer(callback);
+		callback.append("h: ");
+		hVector.printMeToBuffer(callback);
+		callback.append("f: ");
+		hVector.printMeToBuffer(callback);
+	}
 }

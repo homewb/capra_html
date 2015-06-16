@@ -19,9 +19,13 @@ import dataModel.Node;
 public class MOAStar {
 
 	public List<CapraPathLeg> search(Graph<Node, Edge> graph, 
-			Node source, Node target) {
+			Node source, Node target, StringBuffer callback) {
 		
 		System.out.println("from " + source.getId() + " to " + target.getId());
+		
+		callback.append(System.getProperty("line.separator"));
+		callback.append("from " + source.getId() + " to " + target.getId());
+		callback.append(System.getProperty("line.separator"));
 		
 		PriorityQueue<MOAStarNode> openSet = 
 				new PriorityQueue<MOAStarNode>(11, new MOAStarNodeFDistComparator());
@@ -85,8 +89,15 @@ public class MOAStar {
 				}
 				
 				System.out.print("final list: ");
+				
+				callback.append(System.getProperty("line.separator"));
+				callback.append("final list: ");
+				callback.append(System.getProperty("line.separator"));
+				
 				for (MOAStarNode node : goalNDList.getList()) {
 					node.printMe();
+					
+					node.printMeToBuffer(callback);
 				}
 				
 				// remove all the elements in the open set,
@@ -186,6 +197,18 @@ public class MOAStar {
 		}
 		
 		if (!goalNDList.isEmpty()) {
+			
+			for (MOAStarNode node : goalNDList.getList()) {
+				System.out.println("distance = " + node.getGVector().getTotalHorizontalDistance() +
+						", up dist = " + node.getGVector().getTotalUpDistance() + 
+						", slope = " + node.getGVector().getMaxTangent());
+				
+				callback.append("distance = " + node.getGVector().getTotalHorizontalDistance() +
+						", up dist = " + node.getGVector().getTotalUpDistance() + 
+						", slope = " + node.getGVector().getMaxTangent());
+				callback.append(System.getProperty("line.separator"));
+			}
+			
 			List<CapraPathLeg> CapraPaths = new ArrayList<CapraPathLeg>();
 			
 			for (MOAStarNode goal : goalNDList.getList()) {
@@ -231,6 +254,11 @@ public class MOAStar {
 				// print total impossible segments
 				System.out.println("total distance of impossible segments: " + distance_impossible);
 				System.out.println("total distance: " + totalDistanceInLongValue);
+				
+				callback.append("total distance of impossible segments: " + distance_impossible);
+				callback.append(System.getProperty("line.separator"));
+				callback.append("total distance: " + totalDistanceInLongValue);
+				callback.append(System.getProperty("line.separator"));
 				
 				CapraPaths.add(new CapraPathLeg(steps, totalDistance, 
 						source.getLocation(), target.getLocation()));
