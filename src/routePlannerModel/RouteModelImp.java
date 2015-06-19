@@ -33,6 +33,12 @@ public class RouteModelImp implements RouteModel {
 	RoutePlanner routePlanner = new RoutePlanner();
 	
 	@Override
+	public boolean setOriginAndDestination(String origin, String destination) {
+		
+		return routePlanner.setOriginAndDestination(origin, destination);
+	}
+	
+	@Override
 	public String getOriginCoordinate(String origin) {
 		
 		return routePlanner.getOriginCoordinate(origin);
@@ -87,10 +93,10 @@ public class RouteModelImp implements RouteModel {
 	}
 
 	@Override
-	public void calcPath() throws FileNotFoundException, 
+	public void calcPath(String interval) throws FileNotFoundException, 
 	      XMLStreamException, LatLngException, CapraPathNotFoundException {
 		
-		routePlanner.calcPath();
+		routePlanner.calcPath(interval);
 	}
 
 	@Override

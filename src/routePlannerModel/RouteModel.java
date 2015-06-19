@@ -18,6 +18,8 @@ public interface RouteModel {
 	
 	public String getTrainStationName(String origin);
 	
+	public boolean setOriginAndDestination(String origin, String destination);
+	
 	public String getOriginLatLng();
 	
 	public String getDesinLatLng();
@@ -56,7 +58,7 @@ public interface RouteModel {
 	
 	public String getSystemInfomation();
 	
-	public void calcPath() throws FileNotFoundException, 
+	public void calcPath(String interval) throws FileNotFoundException, 
 	      XMLStreamException, LatLngException, CapraPathNotFoundException;
 	
 	public double getEdgeStartLat(int index);

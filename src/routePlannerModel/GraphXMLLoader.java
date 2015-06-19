@@ -29,7 +29,8 @@ import com.google.code.geocoder.model.LatLng;
 
 public class GraphXMLLoader {
 	private XMLInputFactory factory = XMLInputFactory.newInstance();
-	private final static int BOUNDARY_RADIUS = 750;
+	//private final static int BOUNDARY_RADIUS = 750;
+	private final static int BOUNDARY_RADIUS = 1000;
 	
 	public Graph<Node, Edge> creatGraph(LatLng startLocation, 
 			LatLng endLocation, String filename) 

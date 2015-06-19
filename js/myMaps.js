@@ -142,8 +142,11 @@ function updateSolutions() {
 	};	   	  
 	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 	
+	google.visualization.events.addListener(chart, 'onmouseover', getMarker);
+	
 	// Add a listener for checking elevation value of a particular point
 	google.maps.event.addListener(map, 'click', getElevation);
+	google.visualization.events.addListener(chart, 'onmouseover', getMarker);
 
 	calcRoute();
 	directionsDisplay.setMap(map);
@@ -246,11 +249,13 @@ function calcMoa(pathIndex) {
 			strokeOpacity: 1,
 			scale: 4
 	};
+	
+	var color = getRandomColor();
 
 	var newPath = new google.maps.Polyline({
 		path: pathPlanCoordinates,
 		geodesic: true,
-		strokeColor: COLORS[pathIndex],
+		strokeColor: color,
 		strokeOpacity: 0.6,
 		strokeWeight: 2,
 		icons: [{
@@ -345,6 +350,15 @@ function showDistribution() {
 		});
 		edge.setMap(map);
 	}
+}
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);

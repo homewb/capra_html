@@ -22,6 +22,10 @@ public class RoutePlanner {
 	
 	private final static String FILE_HEIDELBERG_CONTOUR = 
 			"osm_contour_Heidelberg_Large.xml";
+	private final static String FILE_FILBERT_SA_CONTOUR_U5 = 
+			"filbert_san_francisco_u5.xml";
+	private final static String FILE_FILBERT_SA_CONTOUR_U10 = 
+			"filbert_san_francisco_u10_edited.xml";
 	private final static String FILE_HEIDELBERG = 
 			"osm_Heidelberg_Large.xml";
 	
@@ -57,6 +61,26 @@ public class RoutePlanner {
 		origin_LatLng = geocoder.getLocation(origin);
 		
 		return origin_LatLng.toUrlValue();
+	}
+	
+	public String getDestinationCoordinate(String destination) {
+		destination_LatLng = geocoder.getLocation(destination);
+		
+		return destination_LatLng.toUrlValue();
+	}
+	
+	public boolean setOriginAndDestination(String origin, String destination) {
+		LatLng start = geocoder.getLocation(origin);
+		LatLng end = geocoder.getLocation(destination);
+		
+		if (start != null && end != null) {
+			origin_LatLng = start;
+			destination_LatLng = end;
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public String getTrainStationName(String origin) {
@@ -98,11 +122,6 @@ public class RoutePlanner {
 		return destination_LatLng.toUrlValue();
 	}
 
-	public String getDestinationCoordinate(String destination) {
-		destination_LatLng = geocoder.getLocation(destination);
-		
-		return destination_LatLng.toUrlValue();
-	}
 	
 	// get step info from Google solution
 	// ========= start point ===============
@@ -294,12 +313,14 @@ public class RoutePlanner {
 	
 
 	// Core function: calculating all possible solutions
-	public void calcPath() throws FileNotFoundException, 
+	public void calcPath(String interval) throws FileNotFoundException, 
 	      XMLStreamException, LatLngException, CapraPathNotFoundException {
 		if (origin_LatLng == null || destination_LatLng == null) {
 			throw new LatLngException(
 					"Origin or destination cannot be empty!");
 		}
+		
+		buffer.setLength(0);   // refresh the buffer;
 		
 		long time1 = System.currentTimeMillis();
 		
@@ -307,10 +328,16 @@ public class RoutePlanner {
 		buffer.append(System.getProperty("line.separator"));
 		
         graphXmlLoader = new GraphXMLLoader();
+        
+        String filename = null;
+        switch (interval) {
+        case "short": filename = FILE_FILBERT_SA_CONTOUR_U5; break;
+        case "medium": filename = FILE_FILBERT_SA_CONTOUR_U10; break;
+        }
 		
 		// Load graph from local OSM file
 		graph_WithContour = graphXmlLoader.creatGraph(
-				origin_LatLng, destination_LatLng, FILE_HEIDELBERG_CONTOUR);
+				origin_LatLng, destination_LatLng, filename);
 //		graph_WithoutContour = graphXmlLoader.creatGraph(
 //				origin_LatLng, destination_LatLng, FILE_HEIDELBERG);
 		

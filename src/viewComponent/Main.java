@@ -64,6 +64,17 @@ public class Main {
 	
 	private void initializeBrowser(final RouteModel model) {
 		// ======== Function registration starts ==============
+		browser.registerFunction("setOriginAndDestination", new BrowserFunction() {
+			public JSValue invoke(JSValue... args) {
+				String origin = args[0].getString();
+				String destination = args[1].getString();
+				
+				boolean result = model.setOriginAndDestination(origin, destination);
+				
+				return JSValue.create(result);
+			}
+		});
+		
 		browser.registerFunction("getTrainStation", new BrowserFunction() {
 			public JSValue invoke(JSValue... args) {
 				String inputText_Origin = args[0].getString();
@@ -75,9 +86,12 @@ public class Main {
 		
 		browser.registerFunction("run", new BrowserFunction() {
 			public JSValue invoke(JSValue... args) {
+				String interval = args[0].getString();
+				
+				System.out.println(interval);
 				
 				try {
-					model.calcPath();
+					model.calcPath(interval);
 					
 					return JSValue.create("true");
 				} catch (FileNotFoundException | XMLStreamException
