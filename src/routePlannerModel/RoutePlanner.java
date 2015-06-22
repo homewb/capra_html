@@ -520,6 +520,8 @@ public class RoutePlanner {
 		for (int i = 0; i < paths_MOAStar.size(); i++) {
 			
 			CapraPathLeg currPath = paths_MOAStar.get(i);
+			currPath.calcUpDistance();
+			currPath.calcMaxTangent();
 			
 			// print data
 			buffer.append("----------------");
@@ -529,14 +531,16 @@ public class RoutePlanner {
 			buffer.append("Elevation at node " + 
 					   currPath.getSteps().get(0).getStartNode().getId() + 
 			           ": " +
-			           currPath.getSteps().get(0).getStartNode().getElevation());
+			           currPath.getSteps().get(0).getStartNode().getElevation() +
+			           ", tangent = " + currPath.getSteps().get(0).getTangent());
 			buffer.append(System.getProperty("line.separator"));
 			
 			for (CapraPathStep ps : currPath.getSteps()) {
 				buffer.append("Elevation at node " + 
 						   ps.getEndNode().getId() + 
 		                   ": " +
-		                   ps.getEndNode().getElevation());
+		                   ps.getEndNode().getElevation() + 
+		                   ", tangent = " + ps.getTangent());
 				buffer.append(System.getProperty("line.separator"));
 				
 			}
@@ -550,6 +554,10 @@ public class RoutePlanner {
 	                       ps.getDistance());
 				buffer.append(System.getProperty("line.separator"));
 			}
+			
+//			buffer.append("dist = " + currPath.getDistance() + ", up = " + currPath.getUpDistance()
+//					+ ", maxTangent = " + currPath.getMaxTangent());
+//			buffer.append(System.getProperty("line.separator"));
 		}
 		
 		// Add rest solutions (by MOA*) to the list

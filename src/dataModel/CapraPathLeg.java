@@ -2,6 +2,8 @@ package dataModel;
 
 import java.util.List;
 
+import routePlannerModel.DistanceCalculator;
+
 import com.google.code.geocoder.model.LatLng;
 
 /*
@@ -13,6 +15,10 @@ public class CapraPathLeg {
 	private Distance distance;
 	private LatLng startLocation;
 	private LatLng endLocation;
+	
+	private double upDistance;
+	private double maxTangent;
+	
 	
 	public CapraPathLeg(List<CapraPathStep> steps, Distance distance, 
 			LatLng startLocation, LatLng endLocation) {
@@ -37,5 +43,42 @@ public class CapraPathLeg {
 	public List<CapraPathStep> getSteps() {
 		return steps;
 	}
+	
+	public void calcUpDistance() {
+		upDistance = 0;
+		for (CapraPathStep step : getSteps()) {
+			step.calcUpDistance();
+			
+			upDistance += step.getUpDistance();
+		}
+	}
 
+	public void calcMaxTangent() {
+		maxTangent = 0;
+		for (CapraPathStep step : getSteps()) {
+			step.calcTangent();
+			
+			if (step.getTangent() > maxTangent) {
+				maxTangent = step.getTangent();
+			}
+		}
+	}
+	
+	public double getUpDistance() {
+		return upDistance;
+	}
+	
+	public double getMaxTangent() {
+		return maxTangent;
+	}
+	
+	
+	public void printMe() {
+		for (CapraPathStep step : getSteps()) {
+			System.out.println("From node " + step.getStartNode().getId() + "(" + step.getStartNode().getElevation()
+					+ ") to node " + step.getEndNode().getId() + "(" + step.getEndNode().getElevation()
+					+ "), dist = " + step.getDistance() + ", up = " + step.getUpDistance()
+					+ ", tangent = " + step.getTangent());
+		}
+	}
 }

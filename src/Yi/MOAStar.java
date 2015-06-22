@@ -88,17 +88,17 @@ public class MOAStar {
 					distUB = 2 * curAStarNode.getGVector().getTotalHorizontalDistance();
 				}
 				
-				System.out.print("final list: ");
+//				System.out.print("final list: ");
+//				
+//				callback.append(System.getProperty("line.separator"));
+//				callback.append("final list: ");
+//				callback.append(System.getProperty("line.separator"));
 				
-				callback.append(System.getProperty("line.separator"));
-				callback.append("final list: ");
-				callback.append(System.getProperty("line.separator"));
-				
-				for (MOAStarNode node : goalNDList.getList()) {
-					node.printMe();
-					
-					node.printMeToBuffer(callback);
-				}
+//				for (MOAStarNode node : goalNDList.getList()) {
+//					node.printMe();
+//					
+//					node.printMeToBuffer(callback);
+//				}
 				
 				// remove all the elements in the open set,
 				// whose F-vector is dominated by the G-vector of the current node
@@ -264,6 +264,11 @@ public class MOAStar {
 						source.getLocation(), target.getLocation()));
 			}
 			
+			for (CapraPathLeg path : CapraPaths) {
+				path.calcUpDistance();
+				path.calcMaxTangent();
+			}
+			
 			return CapraPaths;
 		}
 		return null;
@@ -284,4 +289,5 @@ public class MOAStar {
 		return new Objectives(h1, h2, h3);
 	}
 
+	
 }
