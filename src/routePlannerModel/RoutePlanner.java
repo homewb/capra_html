@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -295,7 +296,7 @@ public class RoutePlanner {
 	
 	// ============ End point ====================
 	
-	public String getDistenceText(int pathIndex) {
+	public String getDistanceText(int pathIndex) {
 		double  distanceValue;
 		
 		if (pathIndex == -1) {
@@ -309,6 +310,19 @@ public class RoutePlanner {
 		DecimalFormat decimalFormat = new DecimalFormat(pattern);
 		
 		return decimalFormat.format(distanceValue / 1000) + "km";
+	}
+	
+	public double getDistanceValue(int pathIndex) {
+		double  distanceValue;
+		
+		if (pathIndex == -1) {
+			distanceValue = routes.get(0).getLegs().get(0).getDistance().getValue();
+		}
+		else  {
+			distanceValue = pathSolutions.get(pathIndex).getDistance().getValue();
+		}
+		
+		return distanceValue;
 	}
 	
 
@@ -333,8 +347,9 @@ public class RoutePlanner {
         switch (interval) {
         case "short": filename = FILE_FILBERT_SA_CONTOUR_U5; break;
         case "medium": filename = FILE_FILBERT_SA_CONTOUR_U10; break;
+        case "HB": filename = FILE_HEIDELBERG_CONTOUR; break;
         }
-		
+        
 		// Load graph from local OSM file
 		graph_WithContour = graphXmlLoader.creatGraph(
 				origin_LatLng, destination_LatLng, filename);
@@ -356,6 +371,8 @@ public class RoutePlanner {
 		long time2 = System.currentTimeMillis();
 		long duration1 = time2 - time1;
 		
+		System.out.println("checkpoint0");
+		
 		buffer.append("reading finished, spent " + duration1 + "ms.");
 		buffer.append(System.getProperty("line.separator"));
 		
@@ -370,12 +387,29 @@ public class RoutePlanner {
 				                   .get(0)
 				                   .getStartLocation();
 		
+		int stepSize = routes.get(0).getLegs().get(0).getSteps().size();
+		LatLng endLatLng = routes.get(0)
+					               .getLegs()
+					               .get(0)
+					               .getSteps()
+					               .get(stepSize-1)
+					               .getEndLocation();
+		
 		long time3 = System.currentTimeMillis();
 		long duration2 = time3 - time2;
 		
 		buffer.append("Google route finished, spent " + duration2 + "ms.");
 		buffer.append(System.getProperty("line.separator"));
 		
+		System.out.println("checkpoint1");
+		
+		// add startPoint and EndPoint into the graph
+		addNewLocationToGraph(startLatLng, graph_WithContour);
+		addNewLocationToGraph(endLatLng, graph_WithContour);
+		
+		System.out.println("checkpoint2");
+		System.out.println("node size: " + graph_WithContour.getNodeList().size());
+		System.out.println("edge size: " + graph_WithContour.getEdgeList().size());
 				                
 		/*
 		 * ******************************
@@ -385,7 +419,9 @@ public class RoutePlanner {
 		
 		// get routes by using different methods
 		pathSolutions.clear();
-		double directDistance = DistanceCalculator.getDistance(startLatLng, destination_LatLng);
+		double directDistance = DistanceCalculator.getDistance(startLatLng, endLatLng);
+		
+		System.out.println("----> " + directDistance);
 		
 		buffer.append(System.getProperty("line.separator"));
 		buffer.append("***CAPRA (Normal)***");
@@ -393,7 +429,7 @@ public class RoutePlanner {
 		buffer.append("Direct distance: " + directDistance);
 		buffer.append(System.getProperty("line.separator"));
 		
-		path_WithContour = getPath(startLatLng, destination_LatLng, CONTOUR, buffer);
+		path_WithContour = getPath(startLatLng, endLatLng, CONTOUR, buffer);
 		
 		// Add first solution (by Capra with contour) to the list
 		pathSolutions.add(path_WithContour);
@@ -515,7 +551,7 @@ public class RoutePlanner {
 		buffer.append("Direct distance: " + directDistance);
 		buffer.append(System.getProperty("line.separator"));
 		
-		paths_MOAStar = getPaths(startLatLng, destination_LatLng, MOASTAR, buffer);
+		//paths_MOAStar = getPaths(startLatLng, endLatLng, MOASTAR, buffer);
 		
 		for (int i = 0; i < paths_MOAStar.size(); i++) {
 			
@@ -660,8 +696,13 @@ public class RoutePlanner {
 
 	private CapraPathLeg getPath(LatLng origin_LatLng, 
 			LatLng destination_LatLng, int algorithmIndex, StringBuffer buffer) {
-		Node source = getNearestNodeFromOrigin(origin_LatLng, algorithmIndex);
-		Node target = getNearestNodeFromDestination(destination_LatLng, algorithmIndex);
+//		Node source = getNearestNodeFromOrigin(origin_LatLng, algorithmIndex);
+//		Node target = getNearestNodeFromDestination(destination_LatLng, algorithmIndex);
+		
+		System.out.println("CA");
+		Node source = getNodeFromGraph(origin_LatLng);
+		Node target = getNodeFromGraph(destination_LatLng);
+		
 		
 		switch (algorithmIndex) {
 		case CONTOUR : return astar.search(graph_WithContour, source, target, buffer);
@@ -674,34 +715,42 @@ public class RoutePlanner {
 	// Get MOAStar solutions
 	private List<CapraPathLeg> getPaths(LatLng origin_LatLng, 
 			LatLng destination_LatLng, int algorithmIndex, StringBuffer buffer) {
-		Node source = getNearestNodeFromOrigin(origin_LatLng, algorithmIndex);
-		Node target = getNearestNodeFromDestination(destination_LatLng, algorithmIndex);
+//		Node source = getNearestNodeFromOrigin(origin_LatLng, algorithmIndex);
+//		Node target = getNearestNodeFromDestination(destination_LatLng, algorithmIndex);
+		
+		System.out.println("MA");
+		Node source = getNodeFromGraph(origin_LatLng);
+		Node target = getNodeFromGraph(destination_LatLng);
 		
 		switch (algorithmIndex) {
 		case MOASTAR : return moastar.search(graph_WithContour, source, target, buffer);
 		default : return null;
 		}
 	}
-
-	private Node getNearestNodeFromOrigin(LatLng latLng_origin, int method) {
-		if (method == CONTOUR)
-			return graph_WithContour.findNearestNode(latLng_origin);
-		else if (method == NO_CONTOUR)
-			return graph_WithoutContour.findNearestNode(latLng_origin);
-		else
-			return graph_WithContour.findNearestNode(latLng_origin);
-		
-		
+	
+	private Node getNodeFromGraph(LatLng location) {
+		return graph_WithContour.findNode(location);
 	}
 
-	private Node getNearestNodeFromDestination(LatLng latLng_destination, int method) {
-		if (method == CONTOUR)
-			return graph_WithContour.findNearestNode(latLng_destination);
-		else if (method == NO_CONTOUR)
-			return graph_WithoutContour.findNearestNode(latLng_destination);
-		else
-			return graph_WithContour.findNearestNode(latLng_destination);
-	}
+//	private Node getNearestNodeFromOrigin(LatLng latLng_origin, int method) {
+//		if (method == CONTOUR)
+//			return graph_WithContour.findNearestNode(latLng_origin);
+//		else if (method == NO_CONTOUR)
+//			return graph_WithoutContour.findNearestNode(latLng_origin);
+//		else
+//			return graph_WithContour.findNearestNode(latLng_origin);
+//		
+//		
+//	}
+//
+//	private Node getNearestNodeFromDestination(LatLng latLng_destination, int method) {
+//		if (method == CONTOUR)
+//			return graph_WithContour.findNearestNode(latLng_destination);
+//		else if (method == NO_CONTOUR)
+//			return graph_WithoutContour.findNearestNode(latLng_destination);
+//		else
+//			return graph_WithContour.findNearestNode(latLng_destination);
+//	}
 	
 	public List<Double> getPathElevationList(int method) {
 		List<Double> elevations = new ArrayList<Double>();
@@ -850,7 +899,21 @@ public class RoutePlanner {
 		return pathSolutions.subList(1, pathSolutions.size());
 	}
 	
-	
+	private void addNewLocationToGraph(LatLng location, Graph<Node, Edge> graph) {
+		Edge closestEdge = graph.findClosestEdge(location);
+		
+		List<Node> nodes = new ArrayList<Node>();
+		nodes.add(closestEdge.getSourceNode());
+		String uuid = "" + UUID.randomUUID();    // generate an unique id in case of duplication
+		nodes.add(new Node(uuid, location));
+		nodes.add(closestEdge.getTargetNode());
+		
+		graph.removeEdge(closestEdge);
+		
+		List<Edge> newEdges = graphXmlLoader.createEdgeFragments(nodes);
+		
+		graph.addNode(nodes, newEdges);
+	}
 	
 	
 }

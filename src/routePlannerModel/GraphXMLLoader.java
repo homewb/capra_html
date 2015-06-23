@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -97,6 +98,7 @@ public class GraphXMLLoader {
 		
 		return new Graph<Node, Edge>(nodes, edges);
 	}
+	
 	
 //	public Graph<Node, Edge> creatGraph(LatLng startLocation, 
 //			LatLng endLocation, String filename) 
@@ -252,6 +254,20 @@ public class GraphXMLLoader {
 		}
 		
 		return edges;
+	}
+	
+	public List<Edge> createEdgeFragments(List<Node> nodes) {
+		List<Edge> edgeFragments = new ArrayList<Edge>();
+		int i = 0;
+		while (i < nodes.size() - 1) {
+			edgeFragments.add(new Edge(nodes.get(i), nodes.get(i + 1)));
+			i++;
+		}
+		
+		calculateElevations(nodes);
+		calculateWeight(edgeFragments);
+		
+		return edgeFragments;
 	}
 	
 	public Map<String, Node> extractNodesByCircularBoundary(
@@ -529,60 +545,70 @@ public class GraphXMLLoader {
 		List<LatLng> locations10 = new ArrayList<LatLng>();
 		List<LatLng> locations11 = new ArrayList<LatLng>();
 		
-		for (int i = 0; i < nodes.size() / 11; i++) {
-			locations1.add(nodes.get(i).getLocation());
+		List<GElevationResult> result;
+		if (nodes.size() < 11) {
+			for (int x = 0; x < nodes.size(); x++) {
+				locations1.add(nodes.get(x).getLocation());
+			}
+			
+			result = elevationApi.getElevationByLocations(locations1);
 		}
-		List<GElevationResult> result = elevationApi.getElevationByLocations(locations1);
-		
-		for (int j = nodes.size() / 11; j < nodes.size() * 2 / 11; j++) {
-			locations2.add(nodes.get(j).getLocation());
+		else {
+			for (int i = 0; i < nodes.size() / 11; i++) {
+				locations1.add(nodes.get(i).getLocation());
+			}
+			result = elevationApi.getElevationByLocations(locations1);
+			
+			for (int j = nodes.size() / 11; j < nodes.size() * 2 / 11; j++) {
+				locations2.add(nodes.get(j).getLocation());
+			}
+			result.addAll(elevationApi.getElevationByLocations(locations2));
+			
+			for (int j = nodes.size() * 2 / 11; j < nodes.size() * 3 / 11; j++) {
+				locations3.add(nodes.get(j).getLocation());
+			}
+			result.addAll(elevationApi.getElevationByLocations(locations3));
+			
+			for (int j = nodes.size() * 3 / 11; j < nodes.size() * 4 / 11; j++) {
+				locations4.add(nodes.get(j).getLocation());
+			}
+			result.addAll(elevationApi.getElevationByLocations(locations4));
+			
+			for (int j = nodes.size() * 4 / 11; j < nodes.size() * 5 / 11; j++) {
+				locations5.add(nodes.get(j).getLocation());
+			}
+			result.addAll(elevationApi.getElevationByLocations(locations5));
+			
+			for (int j = nodes.size() * 5 / 11; j < nodes.size() * 6 / 11; j++) {
+				locations6.add(nodes.get(j).getLocation());
+			}
+			result.addAll(elevationApi.getElevationByLocations(locations6));
+			
+			for (int j = nodes.size() * 6 / 11; j < nodes.size() * 7 / 11; j++) {
+				locations7.add(nodes.get(j).getLocation());
+			}
+			result.addAll(elevationApi.getElevationByLocations(locations7));
+			
+			for (int j = nodes.size() * 7 / 11; j < nodes.size() * 8 / 11; j++) {
+				locations8.add(nodes.get(j).getLocation());
+			}
+			result.addAll(elevationApi.getElevationByLocations(locations8));
+			
+			for (int j = nodes.size() * 8 / 11; j < nodes.size() * 9 / 11; j++) {
+				locations9.add(nodes.get(j).getLocation());
+			}
+			result.addAll(elevationApi.getElevationByLocations(locations9));
+			
+			for (int j = nodes.size() * 9 / 11; j < nodes.size() * 10 / 11; j++) {
+				locations10.add(nodes.get(j).getLocation());
+			}
+			result.addAll(elevationApi.getElevationByLocations(locations10));
+			
+			for (int j = nodes.size() * 10 / 11; j < nodes.size(); j++) {
+				locations11.add(nodes.get(j).getLocation());
+			}
+			result.addAll(elevationApi.getElevationByLocations(locations11));
 		}
-		result.addAll(elevationApi.getElevationByLocations(locations2));
-		
-		for (int j = nodes.size() * 2 / 11; j < nodes.size() * 3 / 11; j++) {
-			locations3.add(nodes.get(j).getLocation());
-		}
-		result.addAll(elevationApi.getElevationByLocations(locations3));
-		
-		for (int j = nodes.size() * 3 / 11; j < nodes.size() * 4 / 11; j++) {
-			locations4.add(nodes.get(j).getLocation());
-		}
-		result.addAll(elevationApi.getElevationByLocations(locations4));
-		
-		for (int j = nodes.size() * 4 / 11; j < nodes.size() * 5 / 11; j++) {
-			locations5.add(nodes.get(j).getLocation());
-		}
-		result.addAll(elevationApi.getElevationByLocations(locations5));
-		
-		for (int j = nodes.size() * 5 / 11; j < nodes.size() * 6 / 11; j++) {
-			locations6.add(nodes.get(j).getLocation());
-		}
-		result.addAll(elevationApi.getElevationByLocations(locations6));
-		
-		for (int j = nodes.size() * 6 / 11; j < nodes.size() * 7 / 11; j++) {
-			locations7.add(nodes.get(j).getLocation());
-		}
-		result.addAll(elevationApi.getElevationByLocations(locations7));
-		
-		for (int j = nodes.size() * 7 / 11; j < nodes.size() * 8 / 11; j++) {
-			locations8.add(nodes.get(j).getLocation());
-		}
-		result.addAll(elevationApi.getElevationByLocations(locations8));
-		
-		for (int j = nodes.size() * 8 / 11; j < nodes.size() * 9 / 11; j++) {
-			locations9.add(nodes.get(j).getLocation());
-		}
-		result.addAll(elevationApi.getElevationByLocations(locations9));
-		
-		for (int j = nodes.size() * 9 / 11; j < nodes.size() * 10 / 11; j++) {
-			locations10.add(nodes.get(j).getLocation());
-		}
-		result.addAll(elevationApi.getElevationByLocations(locations10));
-		
-		for (int j = nodes.size() * 10 / 11; j < nodes.size(); j++) {
-			locations11.add(nodes.get(j).getLocation());
-		}
-		result.addAll(elevationApi.getElevationByLocations(locations11));
 		
 		for (int i = 0; i < nodes.size(); i++) {
 			nodes.get(i).setElevation(result.get(i).getElevation().floatValue());

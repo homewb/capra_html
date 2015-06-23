@@ -54,7 +54,9 @@ public interface RouteModel {
 	public int getMoaSize();   // get total number of MOA solutions
 	// ==== End point =======
 	
-	public String getDistenceText(int pathIndex);
+	public String getDistanceText(int pathIndex);
+	
+	public double getDistanceValue(int pathIndex);
 	
 	public String getSystemInfomation();
 	

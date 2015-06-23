@@ -359,12 +359,23 @@ public class Main {
             }
         });
         
-        browser.registerFunction("getDistance", new BrowserFunction() {
+        browser.registerFunction("getDistanceText", new BrowserFunction() {
         	public JSValue invoke(JSValue... args) {
         		Double value = new Double(args[0].getNumber());
             	int pathIndex = value.intValue();
             	
-            	String distance = model.getDistenceText(pathIndex);
+            	String distance = model.getDistanceText(pathIndex);
+            	
+            	return JSValue.create(distance);
+        	}
+        });
+        
+        browser.registerFunction("getDistanceValue", new BrowserFunction() {
+        	public JSValue invoke(JSValue... args) {
+        		Double value = new Double(args[0].getNumber());
+            	int pathIndex = value.intValue();
+            	
+            	double distance = model.getDistanceValue(pathIndex);
             	
             	return JSValue.create(distance);
         	}

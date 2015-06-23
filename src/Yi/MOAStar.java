@@ -167,6 +167,8 @@ public class MOAStar {
 				if (skip)
 					continue;
 				
+				System.out.println("looping...");
+				
 				if (!visited.get(neighbour)) {
 					// neighbor is new
 					openSet.add(next);

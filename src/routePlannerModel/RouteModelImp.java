@@ -371,9 +371,15 @@ public class RouteModelImp implements RouteModel {
 	}
 
 	@Override
-	public String getDistenceText(int pathIndex) {
+	public String getDistanceText(int pathIndex) {
 		
-		return routePlanner.getDistenceText(pathIndex);
+		return routePlanner.getDistanceText(pathIndex);
+	}
+	
+	@Override
+	public double getDistanceValue(int pathIndex) {
+		
+		return routePlanner.getDistanceValue(pathIndex);
 	}
 
 	@Override

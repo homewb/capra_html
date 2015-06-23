@@ -115,6 +115,7 @@ function plotElevation(results, status) {
 
 	var elevationPath = [];
 	var length = results.length
+	
 	for (var i = 0; i < length; i++) {
 		elevationPath.push(elevations[i].location);
 	}
@@ -133,6 +134,45 @@ function plotElevation(results, status) {
 		legend: 'none',
 		titleY: 'Elevation(m)'
 	});
+	
+	displayRealTimeData(elevations);
+	
+//	var samples = elevations.length;
+//	var totalUpDist = 0;
+//	var maxTangent = 0;
+//	var upDists = [];
+//	var tangents = [];
+//	
+//	var html = "";
+//	
+//	console.log(samples);
+//	
+//	for (var i = 0; i < samples - 1; i++) {
+//		var herizontalDist = distance(elevations[i + 1].location, elevations[i].location);
+//		var verticalDist = elevations[i + 1].elevation - elevations[i].elevation;
+//		
+//		if (verticalDist > 0) {
+//			var curTangent = verticalDist / herizontalDist;
+//			tangents.push(curTangent);
+//			upDists.push(verticalDist);
+//			
+//			if (maxTangent < curTangent) {
+//				maxTangent = curTangent;
+//			}		
+//		}
+//		else {
+//			tangents.push(0);
+//			upDists.push(0);
+//		}
+//		
+//		totalUpDist += verticalDist;
+//	}
+//	
+//	html += "Samples: " + samples + "#13";
+//	html += "TotalUpDist: " + totalUpDist + "#13";
+//	html += "MaxTangent: " + maxTangent + "#13";
+//	
+//	document.getElementById("system_infomation").innerHTML = html;
 }
 	   	
 function updateSolutions() {
@@ -271,14 +311,17 @@ function calcMoa(pathIndex) {
 function getLine(pathIndex) {
 	var currentPath = path_Moa[pathIndex - 1].getPath().getArray();
 	
-	showElevationChart(currentPath);
+	showElevationChart(currentPath, pathIndex);
 	displayInfomation(pathIndex);
 }
 
-function showElevationChart(path) {
+function showElevationChart(path, index) {
+	var distanceValue = getDistanceValue(index);
+	var samples = parseInt(distanceValue / 10);
+	
 	var pathRequest = {
 			path: path,
-			samples: SAMPLES
+			samples: samples
 	}
 
 	elevationService.getElevationAlongPath(pathRequest, plotElevation);
@@ -286,11 +329,11 @@ function showElevationChart(path) {
 
 function selectTab(index) {
 	if (index < 0) {
-		showElevationChart(path_google.overview_path);
+		showElevationChart(path_google.overview_path, -1);
         displayInfomation(-1);
 	}
 	else if (index == 0) {
-		showElevationChart(path_capra.getPath().getArray());
+		showElevationChart(path_capra.getPath().getArray(), 0);
         displayInfomation(0);
 	}
 	else {
@@ -299,11 +342,87 @@ function selectTab(index) {
 }
 
 function displayInfomation(pathIndex) {
-	document.getElementById("distance").innerHTML = getDistance(pathIndex);
+	document.getElementById("distance").innerHTML = getDistanceValue(pathIndex);
 }
 
 function displaySystemInfomation() {
-	document.getElementById("system_infomation").innerHTML = getSysteInfomation();
+	document.getElementById("system_log_info").innerHTML = getSysteInfomation();
+}
+
+function displayRealTimeData(path) {
+	var samples = path.length - 1;
+	var totalUpDist = 0;
+	var maxTangent = 0;
+	var upDists = [];
+	var tangents = [];
+	
+	var html = "";
+	
+	for (var i = 0; i < samples - 1; i++) {
+		var verticalDist = path[i + 1].elevation - path[i].elevation;
+		verticalDist = parseFloat(verticalDist).toFixed(2);
+		verticalDist = parseFloat(verticalDist);
+		
+		if (verticalDist > 0) {
+			var curTangent = verticalDist / 10;
+			curTangent = parseFloat(curTangent).toFixed(2);
+			curTangent = parseFloat(curTangent);
+			tangents.push(curTangent);
+			upDists.push(verticalDist);
+			totalUpDist += verticalDist;
+			
+			if (maxTangent < curTangent) {
+				maxTangent = curTangent;
+			}		
+		}
+		else {
+			tangents.push(0);
+			upDists.push(0);
+		}
+	}
+	
+	html += "Samples:&nbsp&nbsp" + samples + "&#13";
+	html += "TotalUpDist:&nbsp&nbsp" + parseFloat(totalUpDist).toFixed(2) + "m&#13";
+	html += "MaxTangent:&nbsp&nbsp" + maxTangent + "&#13";
+	html += "&#13---------------------------&#13";
+	
+	for (var i = 0; i < samples - 1; i++) {
+		html += "Sample&nbsp" + i + 
+		        "&nbsp&nbsp-->&nbsp&nbspVDist:&nbsp" +  
+		        upDists[i] + 
+		        "m&nbsp&nbspTangent:&nbsp" +
+		        tangents[i] + 
+		        "&#13";
+	}
+	
+	
+	document.getElementById("real_path_info").innerHTML = html;
+}
+
+function distance(location1, location2, unit) {
+	var lat1 = location1.lat();
+	var lng1 = location1.lng();
+	var lat2 = location2.lat();
+	var lng2 = location2.lng();
+	
+    var radlat1 = Math.PI * lat1 / 180;
+	var radlat2 = Math.PI * lat2 / 180;
+	var radlng1 = Math.PI * lng1 / 180;
+	var radlng2 = Math.PI * lng2 / 180;
+	var theta = lng1 - lng2;
+	var radtheta = Math.PI * theta / 180;
+	var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1)
+			* Math.cos(radlat2) * Math.cos(radtheta);
+	dist = Math.acos(dist);
+	dist = dist * 180 / Math.PI;
+	dist = dist * 60 * 1.1515;
+	if (unit == "K") {
+		dist = dist * 1.609344
+	}
+	if (unit == "N") {
+		dist = dist * 0.8684
+	}
+	return dist
 }
 
 function showDistribution() {

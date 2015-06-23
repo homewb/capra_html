@@ -101,6 +101,9 @@
 							<label class="radio-inline">
 								<input type="radio" id="ten" name="optradio" value="medium" />10 meters
 							</label>
+							<!-- <label class="radio-inline">
+								<input type="radio" id="hb" name="optradio" value="HB" />Heidelberg
+							</label> -->
 	                    </span>
 	                    </p>
 	                    
@@ -117,15 +120,14 @@
 
                 <!-- Display Mode -->
                 <div class="well well-sm">
-                    <h5>Display Mode</h5>
                     <div class="row">
                         <div class="col-lg-6">
                             <button id="show_paths" type="button" class="btn btn-primary btn-sm btn-block" 
-                            onclick="updateSolutions()" disabled>Show Paths</button>
+                            onclick="updateSolutions()" disabled>Path view</button>
                         </div>
                         <div class="col-lg-6">
                             <button id="show_distribution" type="button" class="btn btn-primary btn-sm btn-block" 
-                            onclick="showDistribution()" disabled>Distribution</button>
+                            onclick="showDistribution()" disabled>Distribution view</button>
                         </div>
                     </div>
                     <!-- /.row -->
@@ -136,9 +138,20 @@
                 <!-- Path Information -->
                 <div class="well well-sm">
                     <h5>Path Information</h5>
-                    <p>Distance:&nbsp;&nbsp;&nbsp;<span id="distance"></span></p>
-                    <p> Experimental Data:</p>
-                    <textarea class="form-control" rows="10" id="system_infomation"></textarea>
+                    <p>Distance (m):&nbsp;&nbsp;&nbsp;<span id="distance"></span></p>
+                    <ul class="nav nav-tabs">
+					    <li class="active"><a data-toggle="pill" href="#sample_data">Samples details</a></li>
+					    <li><a data-toggle="tab" href="#log_data">System logs</a></li>
+					</ul>
+					
+					<div class="tab-content">
+					    <div id="sample_data" class="tab-pane fade in active">
+					        <textarea class="form-control" rows="10" id="real_path_info"></textarea>
+					    </div>
+					    <div id="log_data" class="tab-pane fade">
+					        <textarea class="form-control" rows="10" id="system_log_info"></textarea> 
+					    </div>
+					</div>
                 </div>
 
             </div>
