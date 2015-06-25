@@ -140,11 +140,16 @@ public class MOAStar {
 				
 				// update the GVector for neighbor
 				float edgeLength = DistanceCalculator.getDistance(curAStarNode.getNode(), neighbour);
-				float edgeHeight = 0; // neighbor's height minus curAStarNode's height
-				if (neighbour.getElevation() > curAStarNode.getNode().getElevation()) {
-					edgeHeight = neighbour.getElevation() - curAStarNode.getNode().getElevation();
+				float edgeHeight = neighbour.getElevation() - curAStarNode.getNode().getElevation();
+				float edgeUpHeight = edgeHeight; // neighbor's height minus curAStarNode's height
+				if (edgeUpHeight < 0) {
+					edgeUpHeight = 0;
 				}
-				float edgeTangent = edgeHeight / edgeLength;
+				float edgeAbsHeight = edgeHeight;
+				if (edgeAbsHeight < 0) {
+					edgeAbsHeight = -edgeAbsHeight;
+				}
+				float edgeTangent = edgeAbsHeight / edgeLength;
 				float neighborHorizontalDistance = 
 						curAStarNode.getGVector().getTotalHorizontalDistance() + edgeLength;
 				float neighborUpDistance = 

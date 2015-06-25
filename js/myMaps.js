@@ -363,22 +363,26 @@ function displayRealTimeData(path) {
 		verticalDist = parseFloat(verticalDist).toFixed(2);
 		verticalDist = parseFloat(verticalDist);
 		
-		if (verticalDist > 0) {
+		// if (verticalDist > 0) {
 			var curTangent = verticalDist / 10;
 			curTangent = parseFloat(curTangent).toFixed(2);
 			curTangent = parseFloat(curTangent);
 			tangents.push(curTangent);
 			upDists.push(verticalDist);
 			totalUpDist += verticalDist;
+
+			absCurTangent = curTangent;
+			if (absCurTangent < 0)
+				absCurTangent = -absCurTangent;
 			
-			if (maxTangent < curTangent) {
-				maxTangent = curTangent;
+			if (maxTangent < absCurTangent) {
+				maxTangent = absCurTangent;
 			}		
-		}
-		else {
-			tangents.push(0);
-			upDists.push(0);
-		}
+		// }
+		// else {
+			// tangents.push(0);
+			// upDists.push(0);
+		// }
 	}
 	
 	html += "Samples:&nbsp&nbsp" + samples + "&#13";
