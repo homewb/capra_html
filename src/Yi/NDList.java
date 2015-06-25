@@ -15,16 +15,16 @@ import java.util.List;
 
 public class NDList<E> {
 
-	private List<E> list;
+	private LinkedList<E> list;
 	private Comparator<E> comparator;
 	
 	// initialize an empty list based on comparator
 	public NDList(Comparator<E> comparator1) {
-		list = new ArrayList<E>();
+		list = new LinkedList<E>();
 		this.comparator = comparator1;
 	}
 	
-	public List<E> getList() {
+	public LinkedList<E> getList() {
 		return list;
 	}
 	

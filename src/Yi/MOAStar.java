@@ -1,7 +1,9 @@
 package Yi;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -212,6 +214,40 @@ public class MOAStar {
 					}
 				}
 			}
+		}
+		
+		
+		// remove the duplicated paths
+		Collection<MOAStarNode> toRemoveGoals = new LinkedList<MOAStarNode>();
+		Iterator<MOAStarNode> ite1 = goalNDList.getList().iterator();
+		while (ite1.hasNext()) {
+			MOAStarNode node1 = ite1.next();
+			Iterator<MOAStarNode> ite2 = ite1;		
+			boolean duplicated = false;
+			
+			while (ite2.hasNext()) {
+				MOAStarNode node2 = ite2.next();
+				if (node2.getGVector().theSameAs(node1.getGVector())) {
+					duplicated = true;
+					break;
+				}
+			}
+			
+			if (duplicated) {
+				toRemoveGoals.add(node1);
+			}
+		}
+		
+		System.out.println("removed:");
+		for (MOAStarNode node : toRemoveGoals) {
+			node.getGVector().printMe();
+		}
+		
+		goalNDList.removeAll(toRemoveGoals);
+		
+		System.out.println("all list:");
+		for (MOAStarNode node : goalNDList.getList()) {
+			node.getGVector().printMe();
 		}
 		
 		if (!goalNDList.isEmpty()) {

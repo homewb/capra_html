@@ -112,6 +112,22 @@ public class Objectives implements Comparable<Objectives> {
 		return 0;
 	}
 	
+	public boolean theSameAs(Objectives o) {
+		if (totalHorizontalDistance > 1.01 * o.getTotalHorizontalDistance() ||
+				totalHorizontalDistance < 0.99 * o.getTotalHorizontalDistance())
+			return false;
+		
+		if (totalUpDistance > 1.01 * o.getTotalUpDistance() ||
+				totalUpDistance < 0.99 * o.getTotalUpDistance())
+			return false;
+		
+		if (maxTangent > 1.01 * o.getMaxTangent() ||
+				maxTangent < 0.99 * o.getMaxTangent())
+			return false;
+		
+		return true;
+	}
+	
 	public void printMe() {
 		System.out.println("horizontal distance = " + totalHorizontalDistance + 
 				", up distance = " + totalUpDistance + ", maxTangent = " + maxTangent);
