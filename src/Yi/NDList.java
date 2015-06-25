@@ -97,7 +97,8 @@ public class NDList<E> {
 	public void printMe() {
 		System.out.println("List members:");
 		for (E e: list) {
-			System.out.println(e);
+//			System.out.println(e);
+			
 		}
 	}
 }

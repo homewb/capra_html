@@ -47,9 +47,12 @@ public class CapraPathLeg {
 	public void calcUpDistance() {
 		upDistance = 0;
 		for (CapraPathStep step : getSteps()) {
-			step.calcUpDistance();
+			step.calcVDistance();
 			
-			upDistance += step.getUpDistance();
+			if (step.getVDistance() < 0)
+				continue;
+			
+			upDistance += step.getVDistance();
 		}
 	}
 
@@ -57,9 +60,10 @@ public class CapraPathLeg {
 		maxTangent = 0;
 		for (CapraPathStep step : getSteps()) {
 			step.calcTangent();
+			double absTangent = Math.abs(step.getTangent());
 			
-			if (step.getTangent() > maxTangent) {
-				maxTangent = step.getTangent();
+			if (absTangent > maxTangent) {
+				maxTangent = absTangent;
 			}
 		}
 	}
@@ -77,7 +81,7 @@ public class CapraPathLeg {
 		for (CapraPathStep step : getSteps()) {
 			System.out.println("From node " + step.getStartNode().getId() + "(" + step.getStartNode().getElevation()
 					+ ") to node " + step.getEndNode().getId() + "(" + step.getEndNode().getElevation()
-					+ "), dist = " + step.getDistance() + ", up = " + step.getUpDistance()
+					+ "), dist = " + step.getDistance() + ", up = " + step.getVDistance()
 					+ ", tangent = " + step.getTangent());
 		}
 	}

@@ -114,6 +114,17 @@ public class MOAStar {
 				}
 				openSet.removeAll(toRemove);
 			}
+	
+//			System.out.println("current node: " + curAStarNode.getNode().getId());
+//			curAStarNode.getGVector().printMe();
+//			System.out.println("non-dominated list:");
+//			for (Objectives obj : openNDGVectors.get(curAStarNode.getNode()).getList()) {
+//				obj.printMe();
+//			}
+//			for (Objectives obj : closedNDGVectors.get(curAStarNode.getNode()).getList()) {
+//				obj.printMe();
+//			}
+			
 			
 			visited.put(curAStarNode.getNode(), true); // this node is visited
 			
@@ -167,7 +178,7 @@ public class MOAStar {
 				if (skip)
 					continue;
 				
-				System.out.println("looping...");
+//				System.out.println("looping...");
 				
 				if (!visited.get(neighbour)) {
 					// neighbor is new
@@ -253,14 +264,14 @@ public class MOAStar {
 						new Distance(totalDistanceInLongValue, 
 								totalDistanceInString);
 				
-				// print total impossible segments
-				System.out.println("total distance of impossible segments: " + distance_impossible);
-				System.out.println("total distance: " + totalDistanceInLongValue);
-				
-				callback.append("total distance of impossible segments: " + distance_impossible);
-				callback.append(System.getProperty("line.separator"));
-				callback.append("total distance: " + totalDistanceInLongValue);
-				callback.append(System.getProperty("line.separator"));
+//				// print total impossible segments
+//				System.out.println("total distance of impossible segments: " + distance_impossible);
+//				System.out.println("total distance: " + totalDistanceInLongValue);
+//				
+//				callback.append("total distance of impossible segments: " + distance_impossible);
+//				callback.append(System.getProperty("line.separator"));
+//				callback.append("total distance: " + totalDistanceInLongValue);
+//				callback.append(System.getProperty("line.separator"));
 				
 				CapraPaths.add(new CapraPathLeg(steps, totalDistance, 
 						source.getLocation(), target.getLocation()));
