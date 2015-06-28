@@ -99,51 +99,6 @@ public class GraphXMLLoader {
 		return new Graph<Node, Edge>(nodes, edges);
 	}
 	
-	
-//	public Graph<Node, Edge> creatGraph(LatLng startLocation, 
-//			LatLng endLocation, String filename) 
-//			throws FileNotFoundException, XMLStreamException {
-//		Boundary boundary = defineBoundary(startLocation, endLocation);
-//		
-//		loadXml(boundary.getSouthwest().getLng().toString(),
-//				boundary.getSouthwest().getLat().toString(),
-//				boundary.getNortheast().getLng().toString(), 
-//				boundary.getNortheast().getLat().toString(),  
-//				filename);
-//		List<Way> ways = extractWays(filename);
-//		Bounds bounds = 
-//				new Bounds(boundary.getSouthwest().getLat().toString(),
-//				           boundary.getSouthwest().getLng().toString(), 
-//				           boundary.getNortheast().getLat().toString(), 
-//				           boundary.getNortheast().getLng().toString());
-//		
-//		// finding mid point could be moved out
-//		float midLat = 
-//				(startLocation.getLat().floatValue() + 
-//						endLocation.getLat().floatValue()) / 2;
-//		float midLng = 
-//				(startLocation.getLng().floatValue() + 
-//						endLocation.getLng().floatValue()) / 2;
-//		LatLng midPoint = 
-//				new LatLng(String.valueOf(midLat), String.valueOf(midLng));
-//		float bDistance = getBoundaryDistance(startLocation, endLocation);
-//		Map<String, Node> nodeMap = 
-//				extractNodesByCircularBoundary(
-//						filename, ways, midPoint, bDistance);
-//		
-//		List<Node> nodes = new ArrayList<Node>(nodeMap.values());
-//		List<Edge> edges = extractEdgesList(nodeMap, ways);
-//		
-//		// Print Test		
-//		System.out.println("size of nodes = " + nodes.size());
-//		System.out.println("size of edges = " + edges.size());
-//		
-//		calculateElevations(nodes);
-//		calculateWeight(edges);	
-//		
-//		return new Graph<Node, Edge>(nodes, edges);
-//	}
-	
 	public float getBoundaryDistance(LatLng start, LatLng end) {
 		float midLat = 
 				(start.getLat().floatValue() + end.getLat().floatValue()) / 2;

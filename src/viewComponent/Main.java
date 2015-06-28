@@ -75,15 +75,6 @@ public class Main {
 			}
 		});
 		
-		browser.registerFunction("getTrainStation", new BrowserFunction() {
-			public JSValue invoke(JSValue... args) {
-				String inputText_Origin = args[0].getString();
-				String name = model.getTrainStationName(inputText_Origin);
-				
-				return JSValue.create(name);
-			}
-		});
-		
 		browser.registerFunction("run", new BrowserFunction() {
 			public JSValue invoke(JSValue... args) {
 				String interval = args[0].getString();
@@ -131,67 +122,6 @@ public class Main {
 				double endLng = model.getEndLng();
 
 				return JSValue.create(endLng);
-			}
-		});
-
-		browser.registerFunction("getFirstLat", new BrowserFunction() {
-			public JSValue invoke(JSValue... args) {
-				Double methodValue = new Double(args[0].getNumber());
-				int method = methodValue.intValue();
-
-				double lat = model.getFirstPathLat(method);
-
-				return JSValue.create(lat);
-			}
-		});
-
-		browser.registerFunction("getFirstLng", new BrowserFunction() {
-			public JSValue invoke(JSValue... args) {
-				Double methodValue = new Double(args[0].getNumber());
-				int method = methodValue.intValue();
-
-				double lng = model.getFirstPathLng(method);
-
-				return JSValue.create(lng);
-			}
-		});
-
-		browser.registerFunction("getLat", new BrowserFunction() {
-			public JSValue invoke(JSValue... args) {
-				Double value = new Double(args[0].getNumber());
-				int index = value.intValue();
-
-				Double methodValue = new Double(args[1].getNumber());
-				int method = methodValue.intValue();
-
-				double lat = model.getPathLat(index, method);
-
-				return JSValue.create(lat);
-			}
-		});
-
-		browser.registerFunction("getLng", new BrowserFunction() {
-			public JSValue invoke(JSValue... args) {
-				Double value = new Double(args[0].getNumber());
-				int index = value.intValue();
-
-				Double methodValue = new Double(args[1].getNumber());
-				int method = methodValue.intValue();
-
-				double lng = model.getPathLng(index, method);
-
-				return JSValue.create(lng);
-			}
-		});
-
-		browser.registerFunction("getPathSize", new BrowserFunction() {
-			public JSValue invoke(JSValue... args) {
-				Double methodValue = new Double(args[0].getNumber());
-				int method = methodValue.intValue();
-
-				int size = model.getPathSize(method);
-
-				return JSValue.create(size);
 			}
 		});
 
@@ -378,6 +308,17 @@ public class Main {
             	double distance = model.getDistanceValue(pathIndex);
             	
             	return JSValue.create(distance);
+        	}
+        });
+        
+        browser.registerFunction("getEstimatedValue", new BrowserFunction() {
+        	public JSValue invoke(JSValue... args) {
+        		Double value = new Double(args[0].getNumber());
+            	int pathIndex = value.intValue();
+            	
+            	String text = model.getEstimateValuesText(pathIndex);
+            	
+            	return JSValue.create(text);
         	}
         });
         

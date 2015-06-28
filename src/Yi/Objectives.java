@@ -1,6 +1,5 @@
 package Yi;
 
-
 /**
  * The objective vector, 
  * including total horizontal distance, total upward distance, maximal tangent
@@ -137,5 +136,12 @@ public class Objectives implements Comparable<Objectives> {
 		callback.append("horizontal distance = " + totalHorizontalDistance + 
 				", up distance = " + totalUpDistance + ", maxTangent = " + maxTangent);
 		callback.append(System.getProperty("line.separator"));
+	}
+	
+	public String printMeToString() {
+		String string = "horizontal distance = " + totalHorizontalDistance + 
+				", up distance = " + totalUpDistance + ", maxTangent = " + maxTangent;
+		
+		return string;
 	}
 }

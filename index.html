@@ -63,9 +63,7 @@
                 <hr>
 				
 				<ul class="nav nav-tabs">
-	                <li data-toggle="tab" class="active"><a href="#" onclick="selectTab(0)">CAPRA</a></li>
-	                <li data-toggle="tab"><a href="#" onclick="selectTab(-1)">Google</a></li>
-	                <li data-toggle="tab" class="dropdown">
+	                <li data-toggle="tab" class="dropdown active">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="#">MOA
 						    <span class="caret"></span>
 						</a>
@@ -73,6 +71,7 @@
 						    
 						</ul>
 					</li>
+					<li data-toggle="tab"><a href="#" onclick="selectTab(-1)">Google</a></li>
 	            </ul>
                 
                 
@@ -137,8 +136,6 @@
 
                 <!-- Path Information -->
                 <div class="well well-sm">
-                    <h5>Path Information</h5>
-                    <p>Distance (m):&nbsp;&nbsp;&nbsp;<span id="distance"></span></p>
                     <ul class="nav nav-tabs">
 					    <li class="active"><a data-toggle="pill" href="#sample_data">Samples details</a></li>
 					    <li><a data-toggle="tab" href="#log_data">System logs</a></li>
@@ -146,10 +143,10 @@
 					
 					<div class="tab-content">
 					    <div id="sample_data" class="tab-pane fade in active">
-					        <textarea class="form-control" rows="10" id="real_path_info"></textarea>
+					        <textarea class="form-control" rows="13" id="real_path_info"></textarea>
 					    </div>
 					    <div id="log_data" class="tab-pane fade">
-					        <textarea class="form-control" rows="10" id="system_log_info"></textarea> 
+					        <textarea class="form-control" rows="13" id="system_log_info"></textarea> 
 					    </div>
 					</div>
                 </div>
@@ -195,8 +192,12 @@
             
             var moaSize = getMoaSize();
             var html = ""; 
-            for (var i = 1; i <= moaSize; i++) {
-            	var html = html.concat('<li><a href="#" onclick="selectTab(' + i + ')">Path ' + i + '</a></li>');
+            for (var i = 0; i < moaSize; i++) {
+            	var color = "#000000";
+            	if (i < 8) {
+            		color = getColor(i);
+            	}
+            	var html = html.concat('<li><a href="#" style="color:' + color + '" onclick="selectTab(' + i + ')">Path ' + i + '</a></li>');
             	
             	console.log(html);
             }

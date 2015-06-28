@@ -16,8 +16,6 @@ public interface RouteModel {
 	
 	public String getDestinationCoordinate(String destination);
 	
-	public String getTrainStationName(String origin);
-	
 	public boolean setOriginAndDestination(String origin, String destination);
 	
 	public String getOriginLatLng();
@@ -35,15 +33,6 @@ public interface RouteModel {
 	public int getRouteSize();
 	// ==== End point =======
 	
-	// get info from non-MOA solution
-	// ==== Start point =======
-	public double getFirstPathLat(int method);	
-	public double getFirstPathLng(int method);	
-	public double getPathLat(int index, int method);	
-	public double getPathLng(int index, int method);	
-	public int getPathSize(int method);
-	// ==== End point =======
-	
 	// get info from MOA solution
 	// ==== Start point =======
 	public double getMoaFirstPathLat(int pathIndex);	
@@ -58,23 +47,23 @@ public interface RouteModel {
 	
 	public double getDistanceValue(int pathIndex);
 	
+	public String getEstimateValuesText(int pathIndex);
+	
 	public String getSystemInfomation();
 	
 	public void calcPath(String interval) throws FileNotFoundException, 
 	      XMLStreamException, LatLngException, CapraPathNotFoundException;
 	
+	// get edges details
+	// ======= Start ========
 	public double getEdgeStartLat(int index);
-	
 	public double getEdgeStartLng(int index);
-	
 	public double getEdgeEndLat(int index);
-	
 	public double getEdgeEndLng(int index);
-	
 	public int getEdgeSize();
-	
 	public int getEdgeWeight(int index);
+	// ======= End =========
 	
-	public String getPathImageUrl();
+	//public String getPathImageUrl();
 	
 }

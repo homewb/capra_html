@@ -21,7 +21,7 @@ import dataModel.Node;
 public class MOAStar {
 
 	public List<CapraPathLeg> search(Graph<Node, Edge> graph, 
-			Node source, Node target, StringBuffer callback) {
+			Node source, Node target, StringBuffer callback, List<String> callbackList) {
 		
 		System.out.println("from " + source.getId() + " to " + target.getId());
 		
@@ -248,6 +248,8 @@ public class MOAStar {
 		System.out.println("all list:");
 		for (MOAStarNode node : goalNDList.getList()) {
 			node.getGVector().printMe();
+			
+			callbackList.add(node.getGVector().printMeToString());
 		}
 		
 		if (!goalNDList.isEmpty()) {
