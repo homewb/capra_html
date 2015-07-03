@@ -142,6 +142,10 @@ public class MOAStar {
 				
 				// update the GVector for neighbor
 				float edgeLength = DistanceCalculator.getDistance(curAStarNode.getNode(), neighbour);
+				
+				if (edgeLength < 0.1) // the two nodes are too close to each other
+					continue;
+				
 				float edgeHeight = neighbour.getElevation() - curAStarNode.getNode().getElevation();
 				float edgeUpHeight = edgeHeight; // neighbor's height minus curAStarNode's height
 				if (edgeUpHeight < 0) {
@@ -152,10 +156,11 @@ public class MOAStar {
 					edgeAbsHeight = -edgeAbsHeight;
 				}
 				float edgeTangent = edgeAbsHeight / edgeLength;
+				
 				float neighborHorizontalDistance = 
 						curAStarNode.getGVector().getTotalHorizontalDistance() + edgeLength;
 				float neighborUpDistance = 
-						curAStarNode.getGVector().getTotalUpDistance() + edgeHeight;
+						curAStarNode.getGVector().getTotalUpDistance() + edgeAbsHeight;
 				float neighborMaxTangent = 
 						curAStarNode.getGVector().getMaxTangent();
 				if (neighborMaxTangent < edgeTangent) {
@@ -219,14 +224,13 @@ public class MOAStar {
 		
 		// remove the duplicated paths
 		Collection<MOAStarNode> toRemoveGoals = new LinkedList<MOAStarNode>();
-		Iterator<MOAStarNode> ite1 = goalNDList.getList().iterator();
-		while (ite1.hasNext()) {
-			MOAStarNode node1 = ite1.next();
-			Iterator<MOAStarNode> ite2 = ite1;		
+		for (int i = 0; i < goalNDList.getList().size()-1; i++) {
+			MOAStarNode node1 = goalNDList.getList().get(i);
 			boolean duplicated = false;
 			
-			while (ite2.hasNext()) {
-				MOAStarNode node2 = ite2.next();
+			for (int j = i+1; j < goalNDList.getList().size(); j++) {
+				MOAStarNode node2 = goalNDList.getList().get(j);
+				
 				if (node2.getGVector().theSameAs(node1.getGVector())) {
 					duplicated = true;
 					break;
@@ -238,10 +242,17 @@ public class MOAStar {
 			}
 		}
 		
-		System.out.println("removed:");
-		for (MOAStarNode node : toRemoveGoals) {
-			node.getGVector().printMe();
-		}
+//		System.out.println("all list:");
+//		for (MOAStarNode node : goalNDList.getList()) {
+//			node.getGVector().printMe();
+//			
+//			callbackList.add(node.getGVector().printMeToString());
+//		}
+//		
+//		System.out.println("removed:");
+//		for (MOAStarNode node : toRemoveGoals) {
+//			node.getGVector().printMe();
+//		}
 		
 		goalNDList.removeAll(toRemoveGoals);
 		

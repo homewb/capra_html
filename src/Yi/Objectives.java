@@ -79,24 +79,24 @@ public class Objectives implements Comparable<Objectives> {
 		int better = 0;
 		int worse = 0;
 		
-		if (totalHorizontalDistance < o.getTotalHorizontalDistance()) {
+		if (totalHorizontalDistance < 0.99 * o.getTotalHorizontalDistance()) {
 			better ++;
 		}
-		else if (totalHorizontalDistance > o.getTotalHorizontalDistance()) {
+		else if (totalHorizontalDistance > 1.01 * o.getTotalHorizontalDistance()) {
 			worse ++;
 		}
 		
-		if (totalUpDistance < o.getTotalUpDistance()) {
+		if (totalUpDistance < 0.99 * o.getTotalUpDistance()) {
 			better ++;
 		}
-		else if (totalUpDistance > o.getTotalUpDistance()) {
+		else if (totalUpDistance > 1.01 * o.getTotalUpDistance()) {
 			worse ++;
 		}
 		
-		if (maxTangent < o.getMaxTangent()) {
+		if (maxTangent < 0.99 * o.getMaxTangent()) {
 			better ++;
 		}
-		else if (maxTangent > o.getMaxTangent()) {
+		else if (maxTangent > 1.01 * o.getMaxTangent()) {
 			worse ++;
 		}
 		

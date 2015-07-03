@@ -295,6 +295,8 @@ function displayRealTimeData(path) {
 	var maxTangent = 0;
 	var upDists = [];
 	var tangents = [];
+
+	var totalVDist = 0;
 	
 	var html = "";
 	
@@ -308,7 +310,15 @@ function displayRealTimeData(path) {
 		curTangent = parseFloat(curTangent);
 		tangents.push(curTangent);
 		upDists.push(verticalDist);
-		totalUpDist += verticalDist;
+
+		absDist = verticalDist;
+		if (absDist < 0)
+			absDist = -absDist;
+
+		totalVDist += absDist;
+
+		if (verticalDist > 0)
+			totalUpDist += verticalDist;
 
 		absCurTangent = curTangent;
 		if (absCurTangent < 0)
@@ -318,6 +328,7 @@ function displayRealTimeData(path) {
 			maxTangent = absCurTangent;
 		}		
 
+		totalUpDist = totalVDist;
 	}
 	
 	html += "&#13---------Real Values--------------&#13";
