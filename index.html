@@ -84,7 +84,7 @@
             <div class="col-md-4">
 
                 <!-- Search Well -->
-                <div class="well well-sm">
+                <div class="well">
 	                <form>
 	                	<div class="form-group">
 	                        <input id="origin" type="text" class="form-control" placeholder="Enter origin address">
@@ -92,7 +92,34 @@
 	                    <div class="form-group">
 	                        <input id="destination" type="text" class="form-control" placeholder="Enter destination address">
 	                    </div>
-	                    <p>Select interval:&nbsp;&nbsp;
+	                    
+	                    <div class="text">
+	                    	<select id="selected_area">
+		                    	<option>-- Select an area --</option>
+							    <option>Russian Hill, San Francisco - 5m</option>
+							    <option>Russian Hill, San Francisco - 10m</option>
+							    <option>Bukit Timah, Singapore - 5m</option>
+							    <option>Lisbon, Portugal - 5m</option>
+							    <option>Heidelberg, Victoria - 10m</option>
+							</select>
+							
+							<button class="btn btn-primary btn-sm pull-right" type="button" onclick="search()">
+			                    Search <span class="glyphicon glyphicon-search"></span>
+			                </button>
+	                    </div>
+	                    
+	                    <!-- <select>
+	                    	<option value="empty">-- Select an area --</option>
+						    <option value="SA_SHORT">San Francisco - 5m</option>
+						    <option value="SA_medium">San Francisco - 10m</option>
+						    <option value="BT_SHORT">Singapore - 5m</option>
+						</select>
+						
+						<button class="btn btn-primary pull-right" type="button" onclick="search()">
+		                    Search <span class="glyphicon glyphicon-search"></span>
+		                </button> -->
+	                    
+	                    <!-- <p>Select interval:&nbsp;&nbsp;
 	                    <span>
 	                    	<label class="radio-inline">
 		                    	<input type="radio" id="five" name="optradio" value="short" checked />5 meters
@@ -100,17 +127,20 @@
 							<label class="radio-inline">
 								<input type="radio" id="ten" name="optradio" value="medium" />10 meters
 							</label>
-							<!-- <label class="radio-inline">
+							<label class="radio-inline">
 								<input type="radio" id="hb" name="optradio" value="HB" />Heidelberg
-							</label> -->
+							</label>
+							<label class="radio-inline">
+								<input type="radio" id="kt" name="optradio" value="BukitTimah" />Bukit Timah
+							</label>
 	                    </span>
-	                    </p>
+	                    </p> -->
 	                    
-	                    <div class="text-right">
-	                    	<button class="btn btn-primary" type="button" onclick="search()">
+	                    <!-- <div class="text-right">
+	                    	<button class="btn btn-primary pull-right" type="button" onclick="search()">
 		                        Search <span class="glyphicon glyphicon-search"></span>
 		                    </button>
-	                    </div>
+	                    </div> -->
 	                </form>
                     <!-- /.form-group -->
                 </div>
@@ -143,10 +173,10 @@
 					
 					<div class="tab-content">
 					    <div id="sample_data" class="tab-pane fade in active">
-					        <textarea class="form-control" rows="13" id="real_path_info"></textarea>
+					        <textarea class="form-control" rows="14" id="real_path_info"></textarea>
 					    </div>
 					    <div id="log_data" class="tab-pane fade">
-					        <textarea class="form-control" rows="13" id="system_log_info"></textarea> 
+					        <textarea class="form-control" rows="14" id="system_log_info"></textarea> 
 					    </div>
 					</div>
                 </div>
@@ -176,11 +206,17 @@
         	
             var input_origin = document.getElementById("origin").value;
             var input_destination = document.getElementById("destination").value;
+            var selectedIndex = document.getElementById("selected_area").selectedIndex;
+            
+            if (selectedIndex < 1) {
+            	alert("Select an area");
+            	return;
+            }
             
             setOriginAndDestination(input_origin, input_destination);
             
             var interval = checkInterval();
-            var response = run(interval);
+            var response = run(selectedIndex);
             if (response == "true") {
                 updateSolutions();
             }

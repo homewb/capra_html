@@ -66,7 +66,7 @@ public class GraphXMLLoader {
 		long duration1 = time2 - time1;
 		System.out.println("extracting nodes and edges takes " + duration1 + "ms.");
 		
-		calculateElevations(nodes);
+		calcElevations(nodes);
 		
 		long time3 = System.currentTimeMillis();
 		long duration2 = time3 - time2;
@@ -77,6 +77,7 @@ public class GraphXMLLoader {
 		return new Graph<Node, Edge>(nodes, edges);
 	}
 	
+	// create graph by giving exact north-west and south-east points 
 	public Graph<Node, Edge> creatGraph(String minLng, String minLat, 
 			String maxLng, String maxLat, String filename) 
 			throws FileNotFoundException, XMLStreamException {
@@ -93,19 +94,19 @@ public class GraphXMLLoader {
 		System.out.println("size of nodes = " + nodes.size());
 		System.out.println("size of edges = " + edges.size());
 		
-		calculateElevations(nodes);
+		calcElevations(nodes);
 		calculateWeight(edges);	
 		
 		return new Graph<Node, Edge>(nodes, edges);
 	}
 	
 	public float getBoundaryDistance(LatLng start, LatLng end) {
-		float midLat = 
-				(start.getLat().floatValue() + end.getLat().floatValue()) / 2;
-		float midLng = 
-				(start.getLng().floatValue() + end.getLng().floatValue()) / 2;
-		LatLng midPoint = 
-				new LatLng(String.valueOf(midLat), String.valueOf(midLng));
+//		float midLat = 
+//				(start.getLat().floatValue() + end.getLat().floatValue()) / 2;
+//		float midLng = 
+//				(start.getLng().floatValue() + end.getLng().floatValue()) / 2;
+//		LatLng midPoint = 
+//				new LatLng(String.valueOf(midLat), String.valueOf(midLng));
 		
 		float distance = BOUNDARY_RADIUS;
 		
@@ -219,7 +220,7 @@ public class GraphXMLLoader {
 			i++;
 		}
 		
-		calculateElevations(nodes);
+		calcElevations(nodes);
 		calculateWeight(edgeFragments);
 		
 		return edgeFragments;
@@ -232,6 +233,8 @@ public class GraphXMLLoader {
 				new FileInputStream(filename));
 		Map<String, Node> rowList = new TreeMap<String, Node>();
 		Map<String, Node> nodeList = new TreeMap<String, Node>();
+		
+		long t1 = System.currentTimeMillis();
 		
 		while (reader.hasNext()) {
 			int event = reader.next();
@@ -260,29 +263,58 @@ public class GraphXMLLoader {
 			}
 		}
 		
-		for (int i = 0; i < ways.size(); i++) {
-			Set<String> allNodes = new TreeSet<String>();
-			for (int j = 0; j < ways.size(); j++) {
-				if (j == i) {
-					continue;
-				}
-				allNodes.addAll(ways.get(j).getNodeList());
-			}
-			
-			Set<String> curNodes = new TreeSet<String>(ways.get(i).getNodeList());
-			
-			curNodes.retainAll(allNodes);
-			
-			Map<String, Node> subNodeList = new TreeMap<String, Node>();
-			
-			for (String nd : curNodes) {
-				Node node;
-				if ((node = rowList.get(nd)) != null) {
-					nodeList.put(nd, node);
-					subNodeList.put(nd, node);
-				}
+		long t2 = System.currentTimeMillis();
+		long duration1 = t2 - t1;
+		System.out.println("reading nodes takes " + duration1 + "ms.");
+		
+		/**
+		 * More nodes but high accuracy
+		 */
+		Set<String> nodes_OnRoads = new TreeSet<String>();
+		for (OsmWay w : ways) {
+			nodes_OnRoads.addAll(w.getNodeList());
+		}
+		
+		for (String nd : nodes_OnRoads) {
+			Node node;
+			if ((node = rowList.get(nd)) != null) {
+				nodeList.put(nd, node);
 			}
 		}
+		
+		System.out.println("finish");
+		
+		/**
+		 * Less nodes but low accuracy
+		 */
+//		for (int i = 0; i < ways.size(); i++) {
+//			Set<String> allNodes = new TreeSet<String>();
+//			for (int j = 0; j < ways.size(); j++) {
+//				if (j == i) {
+//					continue;
+//				}
+//				allNodes.addAll(ways.get(j).getNodeList());
+//			}
+//			
+//			Set<String> curNodes = new TreeSet<String>(ways.get(i).getNodeList());
+//			
+//			curNodes.retainAll(allNodes);
+//			
+//			Map<String, Node> subNodeList = new TreeMap<String, Node>();
+//			
+//			for (String nd : curNodes) {
+//				Node node;
+//				if ((node = rowList.get(nd)) != null) {
+//					nodeList.put(nd, node);
+//					subNodeList.put(nd, node);
+//				}
+//			}
+//		}
+		
+		long t3 = System.currentTimeMillis();
+		long duration2 = t3 - t2;
+		System.out.println("finding intersection takes " + duration2 + "ms.");
+		
 		return nodeList;
 	}
 	
@@ -360,7 +392,7 @@ public class GraphXMLLoader {
 				new FileInputStream(filename));
 		List<OsmWay> wayList = new ArrayList<OsmWay>();
 		
-		String[] road_types = {"primary", "secondary", 
+		String[] road_types = {"primary", "primary_link", "secondary", 
 				"residential", "tertiary", "service", "unclassified", "pedestrian"};
 		
 		List<String> types = new ArrayList<String>();
@@ -479,95 +511,29 @@ public class GraphXMLLoader {
 		
 		return new Boundary(northeast, southwest);
 	}
-
-	/*
-	 * Divide nodes into 11 groups in order to avoid exceeding the limit,
-	 * because one elevation HTTP request can only contain 2000 characters.
-	 * However, this method can be replaced by using PolyLineEncoding.
-	 * For more information, please refer to Google document. 
-	 */
-	private void calculateElevations(List<Node> nodes) {
-        ElevationApi elevationApi = new ElevationApi();
-		List<LatLng> locations1 = new ArrayList<LatLng>();
-		List<LatLng> locations2 = new ArrayList<LatLng>();
-		List<LatLng> locations3 = new ArrayList<LatLng>();
-		List<LatLng> locations4 = new ArrayList<LatLng>();
-		List<LatLng> locations5 = new ArrayList<LatLng>();
-		List<LatLng> locations6 = new ArrayList<LatLng>();
-		List<LatLng> locations7 = new ArrayList<LatLng>();
-		List<LatLng> locations8 = new ArrayList<LatLng>();
-		List<LatLng> locations9 = new ArrayList<LatLng>();
-		List<LatLng> locations10 = new ArrayList<LatLng>();
-		List<LatLng> locations11 = new ArrayList<LatLng>();
-		
+	
+	private void calcElevations(List<Node> nodes) {
+		ElevationApi elevationApi = new ElevationApi();
+		List<LatLng> locations = new ArrayList<LatLng>();
 		List<GElevationResult> result;
-		if (nodes.size() < 11) {
-			for (int x = 0; x < nodes.size(); x++) {
-				locations1.add(nodes.get(x).getLocation());
+		
+		// limit the number of nodes to 500 for each HTTP request
+		int remainder = nodes.size() / 500; 
+		if (remainder == 0) {
+			for (Node n : nodes) {
+				locations.add(n.getLocation());
 			}
 			
-			result = elevationApi.getElevationByLocations(locations1);
+			result = elevationApi.getElevationByLocations(locations);
+			
+			for (int i = 0; i < nodes.size(); i++) {
+				nodes.get(i).setElevation(result.get(i).getElevation().floatValue());
+			}
 		}
 		else {
-			for (int i = 0; i < nodes.size() / 11; i++) {
-				locations1.add(nodes.get(i).getLocation());
-			}
-			result = elevationApi.getElevationByLocations(locations1);
-			
-			for (int j = nodes.size() / 11; j < nodes.size() * 2 / 11; j++) {
-				locations2.add(nodes.get(j).getLocation());
-			}
-			result.addAll(elevationApi.getElevationByLocations(locations2));
-			
-			for (int j = nodes.size() * 2 / 11; j < nodes.size() * 3 / 11; j++) {
-				locations3.add(nodes.get(j).getLocation());
-			}
-			result.addAll(elevationApi.getElevationByLocations(locations3));
-			
-			for (int j = nodes.size() * 3 / 11; j < nodes.size() * 4 / 11; j++) {
-				locations4.add(nodes.get(j).getLocation());
-			}
-			result.addAll(elevationApi.getElevationByLocations(locations4));
-			
-			for (int j = nodes.size() * 4 / 11; j < nodes.size() * 5 / 11; j++) {
-				locations5.add(nodes.get(j).getLocation());
-			}
-			result.addAll(elevationApi.getElevationByLocations(locations5));
-			
-			for (int j = nodes.size() * 5 / 11; j < nodes.size() * 6 / 11; j++) {
-				locations6.add(nodes.get(j).getLocation());
-			}
-			result.addAll(elevationApi.getElevationByLocations(locations6));
-			
-			for (int j = nodes.size() * 6 / 11; j < nodes.size() * 7 / 11; j++) {
-				locations7.add(nodes.get(j).getLocation());
-			}
-			result.addAll(elevationApi.getElevationByLocations(locations7));
-			
-			for (int j = nodes.size() * 7 / 11; j < nodes.size() * 8 / 11; j++) {
-				locations8.add(nodes.get(j).getLocation());
-			}
-			result.addAll(elevationApi.getElevationByLocations(locations8));
-			
-			for (int j = nodes.size() * 8 / 11; j < nodes.size() * 9 / 11; j++) {
-				locations9.add(nodes.get(j).getLocation());
-			}
-			result.addAll(elevationApi.getElevationByLocations(locations9));
-			
-			for (int j = nodes.size() * 9 / 11; j < nodes.size() * 10 / 11; j++) {
-				locations10.add(nodes.get(j).getLocation());
-			}
-			result.addAll(elevationApi.getElevationByLocations(locations10));
-			
-			for (int j = nodes.size() * 10 / 11; j < nodes.size(); j++) {
-				locations11.add(nodes.get(j).getLocation());
-			}
-			result.addAll(elevationApi.getElevationByLocations(locations11));
-		}
-		
-		for (int i = 0; i < nodes.size(); i++) {
-			nodes.get(i).setElevation(result.get(i).getElevation().floatValue());
-		}
+			calcElevations(nodes.subList(0, 499));
+			calcElevations(nodes.subList(499, nodes.size()));
+		}		
 	}
 	
 	private void calculateWeight(List<Edge> edges) {

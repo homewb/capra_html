@@ -72,10 +72,10 @@ public class RouteModelImp implements RouteModel {
 	}
 
 	@Override
-	public void calcPath(String interval) throws FileNotFoundException, 
+	public void calcPath(int index) throws FileNotFoundException, 
 	      XMLStreamException, LatLngException, CapraPathNotFoundException {
 		
-		routePlanner.calcPath(interval);
+		routePlanner.calcPath(index);
 	}
 
 	@Override

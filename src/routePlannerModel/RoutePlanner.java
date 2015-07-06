@@ -23,6 +23,9 @@ public class RoutePlanner {
 			"filbert_san_francisco_u5.xml";
 	private final static String FILE_FILBERT_SA_CONTOUR_U10 = 
 			"filbert_san_francisco_u10_edited.xml";
+	private final static String FILE_BUKIT_TIMAH_SINGAPORE_U5 = 
+			"singapore_u5.xml";
+	private final static String FILE_LISBON_U5 = "lisbon_u5.xml";
 	
 	// store path calculated by different methods
 	private List<GDirectionsRoute> routes = 
@@ -238,7 +241,7 @@ public class RoutePlanner {
 	
 
 	// Core function: calculating all possible solutions
-	public void calcPath(String interval) throws FileNotFoundException, 
+	public void calcPath(int selectedIndex) throws FileNotFoundException, 
 	      XMLStreamException, LatLngException, CapraPathNotFoundException {
 		if (origin_LatLng == null || destination_LatLng == null) {
 			throw new LatLngException(
@@ -261,10 +264,12 @@ public class RoutePlanner {
         graphXmlLoader = new GraphXMLLoader();
         
         String filename = null;
-        switch (interval) {
-        case "short": filename = FILE_FILBERT_SA_CONTOUR_U5; break;
-        case "medium": filename = FILE_FILBERT_SA_CONTOUR_U10; break;
-        case "HB": filename = FILE_HEIDELBERG_CONTOUR; break;
+        switch (selectedIndex) {
+        case 1: filename = FILE_FILBERT_SA_CONTOUR_U5; break;
+        case 2: filename = FILE_FILBERT_SA_CONTOUR_U10; break;
+        case 3: filename = FILE_BUKIT_TIMAH_SINGAPORE_U5; break;
+        case 4: filename = FILE_LISBON_U5; break;
+        case 5: filename = FILE_HEIDELBERG_CONTOUR; break;
         }
         
 		// Load graph from local OSM file

@@ -51,7 +51,7 @@ public interface RouteModel {
 	
 	public String getSystemInfomation();
 	
-	public void calcPath(String interval) throws FileNotFoundException, 
+	public void calcPath(int index) throws FileNotFoundException, 
 	      XMLStreamException, LatLngException, CapraPathNotFoundException;
 	
 	// get edges details

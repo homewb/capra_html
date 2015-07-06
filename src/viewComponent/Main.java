@@ -77,12 +77,13 @@ public class Main {
 		
 		browser.registerFunction("run", new BrowserFunction() {
 			public JSValue invoke(JSValue... args) {
-				String interval = args[0].getString();
+				Double indexValue = new Double(args[0].getNumber());
+				int index = indexValue.intValue();
 				
-				System.out.println(interval);
+				System.out.println(index);
 				
 				try {
-					model.calcPath(interval);
+					model.calcPath(index);
 					
 					return JSValue.create("true");
 				} catch (FileNotFoundException | XMLStreamException
