@@ -254,7 +254,9 @@ public class RoutePlanner {
 		 * ******************************
 		 */
 		
-		buffer.setLength(0);   // refresh the buffer;
+		// empty previous records
+		buffer.setLength(0); 
+		estimateValues.clear();
 		
 		long time1 = System.currentTimeMillis();
 		

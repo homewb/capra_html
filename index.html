@@ -88,9 +88,10 @@
 	                <form>
 	                	<div class="form-group">
 	                        <input id="origin" type="text" class="form-control" placeholder="Enter origin address">
-	                    </div>
-	                    <div class="form-group">
-	                        <input id="destination" type="text" class="form-control" placeholder="Enter destination address">
+	                        <button class="btn btn-primary btn-xs pull-right" type="button" onclick="swap()">
+			                    <span class="glyphicon glyphicon-sort"></span>
+			                </button>
+			                <input id="destination" type="text" class="form-control" placeholder="Enter destination address">
 	                    </div>
 	                    
 	                    <div class="text">
@@ -107,40 +108,6 @@
 			                    Search <span class="glyphicon glyphicon-search"></span>
 			                </button>
 	                    </div>
-	                    
-	                    <!-- <select>
-	                    	<option value="empty">-- Select an area --</option>
-						    <option value="SA_SHORT">San Francisco - 5m</option>
-						    <option value="SA_medium">San Francisco - 10m</option>
-						    <option value="BT_SHORT">Singapore - 5m</option>
-						</select>
-						
-						<button class="btn btn-primary pull-right" type="button" onclick="search()">
-		                    Search <span class="glyphicon glyphicon-search"></span>
-		                </button> -->
-	                    
-	                    <!-- <p>Select interval:&nbsp;&nbsp;
-	                    <span>
-	                    	<label class="radio-inline">
-		                    	<input type="radio" id="five" name="optradio" value="short" checked />5 meters
-		                    </label>
-							<label class="radio-inline">
-								<input type="radio" id="ten" name="optradio" value="medium" />10 meters
-							</label>
-							<label class="radio-inline">
-								<input type="radio" id="hb" name="optradio" value="HB" />Heidelberg
-							</label>
-							<label class="radio-inline">
-								<input type="radio" id="kt" name="optradio" value="BukitTimah" />Bukit Timah
-							</label>
-	                    </span>
-	                    </p> -->
-	                    
-	                    <!-- <div class="text-right">
-	                    	<button class="btn btn-primary pull-right" type="button" onclick="search()">
-		                        Search <span class="glyphicon glyphicon-search"></span>
-		                    </button>
-	                    </div> -->
 	                </form>
                     <!-- /.form-group -->
                 </div>
@@ -190,14 +157,12 @@
     <!-- /.container -->
     
     <script type="text/javascript">
-    	function checkInterval() {
-    		var intervals = document.getElementsByName("optradio");
-    		var x;
-    		for (x in intervals) {
-    			if (intervals[x].checked) {
-    				return intervals[x].value;
-    			}
-    		}
+    	function swap() {
+    		var input_origin = document.getElementById("origin").value;
+            var input_destination = document.getElementById("destination").value;
+            
+            document.getElementById("origin").value = input_destination;
+            document.getElementById("destination").value = input_origin;
     	}
     
         function search() {
@@ -215,7 +180,6 @@
             
             setOriginAndDestination(input_origin, input_destination);
             
-            var interval = checkInterval();
             var response = run(selectedIndex);
             if (response == "true") {
                 updateSolutions();
